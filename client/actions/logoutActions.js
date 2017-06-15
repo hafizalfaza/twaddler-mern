@@ -1,9 +1,8 @@
-import {RESET_REDUX_STATE} from './types';
+import { RESET_REDUX_STATE } from './types';
 
-
-//Reset redux store
-export function resetReduxState(){
-	return {
-		type: RESET_REDUX_STATE
-	}
+// Reset redux store
+export function resetReduxState() {
+  return {
+    type: RESET_REDUX_STATE,
+  };
 }

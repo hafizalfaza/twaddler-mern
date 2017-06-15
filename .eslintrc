@@ -1,6 +1,33 @@
 {
-	"plugins": [
-		"json",
-		"markdown"
-	]
+  parser: "babel-eslint",
+  "env": {
+    "browser": true,
+    "node": true,
+  },
+  "rules": {
+    "import/imports-first": [ "warn", "DISABLE-absolute-first" ],
+	"linebreak-style": ["warn", "windows"],
+    "max-len": [0, 120, 2, {ignoreComments: true}],
+	"no-unused-vars": [0, {"vars": "all", "args": "after-used"}],
+    "prop-types": [0],
+	"no-else-return": [0],
+	"comma-dangle": [0],
+	"arrow-body-style": [0],
+	"import/first": [0],
+	"import/prefer-default": [0],
+	"import/prefer-default-export": [0],
+	"prefer-template": [0],
+	"global-require": [0],
+	"no-underscore-dangle": [0],
+	"no-console": [0],
+	"class-methods-use-this": [0],
+	"no-case-declarations": [0],
+	"no-plusplus": [0],
+	"no-fallthrough": [0],
+	"no-unneeded-ternary": [0],
+	"no-shadow": [0],
+	"no-param-reassign": [0],
+	"no-nested-ternary": [0],
+  },
+  "extends": ["airbnb-base"]
 }

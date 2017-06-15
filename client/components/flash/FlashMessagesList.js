@@ -17,13 +17,13 @@ class FlashMessagesList extends React.Component {
 
 FlashMessagesList.propTypes = {
   messages: PropTypes.array.isRequired,
-  deleteFlashMessage: PropTypes.func.isRequired
-}
+  deleteFlashMessage: PropTypes.func.isRequired,
+};
 
 function mapStateToProps(state) {
   return {
-    messages: state.flashMessages
-  }
+    messages: state.flashMessages,
+  };
 }
 
 export default connect(mapStateToProps, { deleteFlashMessage })(FlashMessagesList);

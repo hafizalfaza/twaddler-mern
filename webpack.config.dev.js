@@ -21,14 +21,14 @@ export default {
 			{
 				test: /\.js$/,
 				include: path.join(__dirname, 'client'),
-				loaders: ["react-hot-loader", "babel-loader"]
+				loaders: ["react-hot-loader", "babel-loader", "eslint-loader"]
 			},
 			 {
 				test: /\.(jpe?g|png|gif|svg)$/i,
 				loaders: [
 				  'file-loader'
 				]
-			  }
+			  },
 		]
 	},
 	resolve: {
