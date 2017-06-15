@@ -1,15 +1,9 @@
-import {GET_USER_INFORMATION} from '../actions/types';
+import { GET_USER_INFORMATION, SET_PROFILE_DATA } from '../actions/types';
 
-export default(state=[], action={}){
-	switch(action.type){
-		case GET_USER_INFORMATION:
-		return [
-			...state,
-			{
-				
-			}	
-		];
-		
-		default: return state;
-	}
-}
+export default(state = [], action = {}) => {
+  switch (action.type) {
+    case SET_PROFILE_DATA:
+      return action.data;
+    default: return state;
+  }
+};

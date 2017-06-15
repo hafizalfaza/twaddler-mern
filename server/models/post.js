@@ -61,6 +61,12 @@ export function getRecentPostsByCurrentUser(following, latestPost, callback){
 	}			
 }
 
+export function getPostsForProfile(userId, callback){
+	const query = {postedBy: userId};
+	const select = {__v:0};
+	Post.find(query, select, callback).sort({postDate: -1});
+}
+
 export function addPostToDB(newPost, user, callback){
 
 	User.update({_id: user}, {$inc: {posts: 1}}, () => newPost.save(callback));

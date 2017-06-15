@@ -5,6 +5,7 @@ import search from './reducers/search';
 import notification from './reducers/notification';
 import socket from './reducers/socket';
 import newsfeed from './reducers/newsfeed';
+import profile from './reducers/profile';
 
 
 // Reducers combination
@@ -15,6 +16,7 @@ const appReducer = combineReducers({
   notification,
   socket,
   newsfeed,
+  profile,
 });
 
 

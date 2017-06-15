@@ -1,7 +1,7 @@
 import express from 'express';
 import authenticate from '../middlewares/authenticate';
 import validateInput from '../shared/validations/userPostValidations';
-import {addCommentToDB, getInitialPostsByCurrentUser, getRecentPostsByCurrentUser, addPostToDB, Post, getPostByPostId, addUserToPostLikes} from '../models/post';
+import {addCommentToDB, getInitialPostsByCurrentUser, getRecentPostsByCurrentUser, getPostsForProfile, addPostToDB, Post, getPostByPostId, addUserToPostLikes} from '../models/post';
 import {getUserById, getUsernameById, getFollowingByCurrentUser, requestToFollow, getUserByUsername, resetUnreadNotifications} from '../models/user';
 import {addNotificationToDB, getNotificationsByUserId, incrementUnreadNotifications} from '../models/notification';
 import {$,jQuery} from 'jquery';
@@ -485,20 +485,56 @@ router.post('/auth', authenticate, (req, res) => {
 });
 
 
-//Get user info
+//Get user profile data
 
-router.get('/info/:username', (req, res) => {
+router.get('/profile/:username', (req, res) => {
 	const username = req.params.username;
 	
 	getUserByUsername(username, (err, user) => {
 		if(err){
 			res.status(500).json({status: "failed"});
 		}else{
-			res.status(200).json({status: "ok", user: user})
+			const userId = user._id
+			getPostsForProfile(userId, (err, posts) => {
+				if(err){
+					res.status(500).json({msg: "error"})
+				}else{
+					
+					const commentsUserIdArray = []
+					
+					for(let i = 0; i < posts.length; i++){
+						for(let j = 0; j < posts[i].comments.length; j++){
+							commentsUserIdArray.push(posts[i].comments[j].user)
+						}
+					}
+					
+					getUsernameById(commentsUserIdArray, (err, username) => {
+						if(err){
+							res.status(500).json({msg: 'error'})
+						}else{
+							
+							for(let i = 0; i < posts.length; i++){
+								for(let j = 0; j < posts[i].comments.length; j++){
+									for(let k = 0; k < username.length; k++){
+										if(posts[i].comments[j].user.toString()==username[k]._id){
+											posts[i].comments[j].user=username[k].username;
+										}
+									}
+								}
+							}						
+							
+							for(let i = 0; i < posts.length; i++){
+								posts[i].postedBy = req.params.username;
+							}
+							res.status(200).json({userInfo: user, posts: posts})
+								
+						}
+					});
+				}
+			});
 		}
 	});
 });	
-
 
 //Get notifications
 
