@@ -15,3 +15,9 @@ export function setProfileData(data) {
   };
 }
 
+export function updateProfileData(newUserData) {
+  return (dispatch) => {
+    return axios.post('/api/users/profile/update', newUserData);
+  };
+}
+

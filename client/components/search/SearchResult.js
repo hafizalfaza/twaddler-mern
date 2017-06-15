@@ -80,18 +80,19 @@ class SearchResult extends React.Component {
   }
 
   render() {
-    const { id, fullName, username, bio } = this.props.eachData;
+    const { id, fullName, username, bio, profilePic } = this.props.eachData;
     const { isLoading, following, followed, buttonStyle, profileClicked } = this.state;
     const followsYou = 'FOLLOWS YOU';
     return (
       <div>
         <div className='media'>
           <div className='media-left'>
-            <span>image</span>
+            <img src={ profilePic } style={ { width: 100 } }/>
           </div>
           <div className='media-body'>
             <h4 className='media-heading'><a href='#' name={ username } onClick={ this.clickUser }>{ username }</a>&nbsp;&nbsp;&nbsp;&nbsp;<button name={ id } onClick={ this.followRequest } onMouseEnter={ this.hoverToFollowButton } onMouseLeave={ this.leaveButton } className={ following ? buttonStyle.class : 'btn btn-primary btn-sm' } disabled={ isLoading }>{ following ? buttonStyle.text : '+ Follow' }</button></h4>
-            <p>{ fullName }&nbsp;&nbsp;&nbsp;&nbsp;{ followed ? followsYou : false }</p>
+            <h5>{ fullName }&nbsp;&nbsp;&nbsp;&nbsp;{ followed ? followsYou : false }</h5>
+            <p>{ bio }</p>
           </div>
         </div>
       </div>

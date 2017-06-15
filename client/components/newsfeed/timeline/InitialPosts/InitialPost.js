@@ -31,44 +31,54 @@ class InitialPost extends React.Component {
   }
 
   assignLikeStatus() {
-    const isLikedByCurrentUser = $.inArray(this.props.user.user.username, this.props.initialPost.likedBy);
-    if (isLikedByCurrentUser === -1) {
-      this.setState({ liked: false, numberOfLikes: this.props.initialPost.likes });
-    } else {
-      this.setState({ liked: true, numberOfLikes: this.props.initialPost.likes });
+    if (this.props.auth) {
+      const isLikedByCurrentUser = $.inArray(this.props.user.user.username, this.props.initialPost.likedBy);
+      if (isLikedByCurrentUser === -1) {
+        this.setState({ liked: false, numberOfLikes: this.props.initialPost.likes });
+      } else {
+        this.setState({ liked: true, numberOfLikes: this.props.initialPost.likes });
+      }
     }
   }
 
   like(e) {
-    const data = { likedId: e.target.id, triggeredBy: this.props.user.id, liked: this.state.liked };
     e.preventDefault();
-    if (!this.state.isLiking) {
-      this.setState({ isLiking: true });
-      if (!this.state.liked) {
-        this.props.likeThis(data).then(
-          (res) => {
-            this.setState({ liked: true, numberOfLikes: res.data.postLiked.likes, likedByUsers: res.data.postLiked.likedBy, isLiking: false });
-            this.props.sendNotification(res.data);
-          },
-          (err) => { this.setState({ errors: err.response.data, isLiking: false }); },
-        );
-      } else {
-        this.props.likeThis(data).then(
-          (res) => {
-            this.setState({ liked: false, numberOfLikes: res.data.postLiked.likes, likedByUsers: res.data.postLiked.likedBy, isLiking: false });
-          },
-          (err) => { this.setState({ errors: err.response.data, isLiking: false }); },
-        );
+    if (this.props.user) {
+      const data = { likedId: e.target.id, triggeredBy: this.props.user.id, liked: this.state.liked };
+      if (!this.state.isLiking) {
+        this.setState({ isLiking: true });
+        if (!this.state.liked) {
+          this.props.likeThis(data).then(
+            (res) => {
+              this.setState({ liked: true, numberOfLikes: res.data.postLiked.likes, likedByUsers: res.data.postLiked.likedBy, isLiking: false });
+              this.props.sendNotification(res.data);
+            },
+            (err) => { this.setState({ errors: err.response.data, isLiking: false }); },
+          );
+        } else {
+          this.props.likeThis(data).then(
+            (res) => {
+              this.setState({ liked: false, numberOfLikes: res.data.postLiked.likes, likedByUsers: res.data.postLiked.likedBy, isLiking: false });
+            },
+            (err) => { this.setState({ errors: err.response.data, isLiking: false }); },
+          );
+        }
       }
+    } else {
+      this.context.router.history.push('/');
     }
   }
 
   onClickComment(e) {
     e.preventDefault();
-    if (this.state.commentActive) {
-      this.setState({ commentActive: false });
+    if (this.props.user) {
+      if (this.state.commentActive) {
+        this.setState({ commentActive: false });
+      } else {
+        this.setState({ commentActive: true });
+      }
     } else {
-      this.setState({ commentActive: true });
+      this.context.router.history.push('/');
     }
   }
 
@@ -91,7 +101,7 @@ class InitialPost extends React.Component {
   }
 
   render() {
-    const { _id, postedBy, text, postDate, likes, likedBy, commentsCount } = this.props.initialPost;
+    const { _id, postedBy, fullName, text, postDate, likes, likedBy, commentsCount, profilePic } = this.props.initialPost;
     const { comments } = this.props;
     const { liked, numberOfLikes, likedByUsers, commentActive } = this.state;
     const loveOn = require('./love_on.png');
@@ -102,6 +112,27 @@ class InitialPost extends React.Component {
     const threeLikeThis = likedByUsers[0] + ', ' + likedByUsers[1] + ', and ' + likedByUsers[2] + ' like this';
     const peopleLikeThis = likedByUsers[2] + ', ' + likedByUsers[3] + ', and ' + (likedByUsers.length - 2) + ' others like this';
     const profileLink = `/profile/${postedBy}`;
+
+    const convertedPostDate = new Date(postDate);
+    const currentDate = new Date();
+
+    const second = (currentDate - convertedPostDate) / 1000;
+    const minute = second / 60;
+    const hour = minute / 60;
+    const day = hour / 24;
+    const week = day / 7;
+    const month = week / 30;
+    const year = month / 12;
+
+    const secondStatement = Math.floor(second) + 's';
+    const minuteStatement = Math.floor(minute) + 'm';
+    const hourStatement = Math.floor(hour) + 'h';
+    const dayStatement = Math.floor(day) + 'd';
+    const weekStatement = Math.floor(week) + 'w';
+    const monthStatement = Math.floor(month) + 'mo';
+    const yearStatement = Math.floor(year) + 'y';
+    const recentStatement = 'a moment ago';
+
     const commentInput = (
       <div>
         <div style={ { paddingTop: 10 } }>
@@ -119,10 +150,12 @@ class InitialPost extends React.Component {
       <div>
         <div className="media well" style={ { paddingBottom: 10 } }>
           <div className="media-left">
-            <img src="http://www.synbio.cam.ac.uk/images/avatar-generic.jpg" className="media-object" style={ { width: 50 } }/>
+            <img src={ profilePic } className="media-object" style={ { width: 50 } }/>
           </div>
           <div className="media-body">
-            <h4 className="media-heading"><Link to= { profileLink }>{ postedBy }</Link>&nbsp;&nbsp;&nbsp;&nbsp;<span style={ { fontSize: 10 } }>{ postDate }</span></h4>
+            <h4 className="media-heading"><Link to= { profileLink } style={ { fontSize: 15 } }>@{ postedBy }</Link>&nbsp;<span style={ { fontSize: 13 } }>{ fullName }</span>&nbsp;&bull;&nbsp;
+              <span style={ { fontSize: 12, color: 'gray' } }>{ second >= 1 && minute < 1 ? secondStatement : minute >= 1 && hour < 1 ? minuteStatement : hour >= 1 && day < 1 ? hourStatement : day >= 1 && week < 1 ? dayStatement : recentStatement }</span>
+            </h4>
             <p>{ text }</p>
             <div className="pull-left">
               <a href="#" onClick={ this.onClickComment } style={ { textDecoration: 'none' } }><span ><img src={ comment } style={ { width: 14 } }/></span></a>&nbsp;<span>{ commentsCount }</span>
@@ -140,6 +173,10 @@ class InitialPost extends React.Component {
 InitialPost.propTypes = {
   initialPost: PropTypes.object.isRequired,
   likeThis: PropTypes.func.isRequired,
+};
+
+InitialPost.contextTypes = {
+  router: PropTypes.object.isRequired,
 };
 
 function mapStateToProps(state) {

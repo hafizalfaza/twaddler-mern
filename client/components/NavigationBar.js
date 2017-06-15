@@ -44,12 +44,13 @@ class NavigationBar extends React.Component {
     this.props.search(this.state.searchInput).then(
       (res) => {
         if (res.data.user) {
-          const { _id, fullName, username, bio, following, followers } = res.data.user;
+          const { _id, fullName, username, bio, following, followers, profilePic } = res.data.user;
           this.props.fetchSearchResult({
             id: _id,
             fullName,
             username,
             bio,
+            profilePic,
             following,
             followers,
           });
@@ -92,7 +93,8 @@ class NavigationBar extends React.Component {
 
     const guestLinks = (
       <ul className='nav navbar-nav navbar-right'>
-        <li><Link to='/signup'>Sign Up</Link></li>
+        <li><Link to='/'>Login</Link></li>
+        <li><Link to='/signup'>Signup</Link></li>
       </ul>
     );
 

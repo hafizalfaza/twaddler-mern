@@ -2,7 +2,7 @@ import express from 'express';
 import authenticate from '../middlewares/authenticate';
 import validateInput from '../shared/validations/userPostValidations';
 import {addCommentToDB, getInitialPostsByCurrentUser, getRecentPostsByCurrentUser, getPostsForProfile, addPostToDB, Post, getPostByPostId, addUserToPostLikes} from '../models/post';
-import {getUserById, getUsernameById, getFollowingByCurrentUser, requestToFollow, getUserByUsername, resetUnreadNotifications} from '../models/user';
+import {getUserById, getUsernameById, getFollowingByCurrentUser, requestToFollow, getUserByUsername, resetUnreadNotifications, updateProfileData} from '../models/user';
 import {addNotificationToDB, getNotificationsByUserId, incrementUnreadNotifications} from '../models/notification';
 import {$,jQuery} from 'jquery';
 
@@ -64,12 +64,14 @@ router.get('/timeline/initial', authenticate, (req, res) => {
 								res.status(204).json({success: true, msg: 'No posts to display', initialPosts: initialPosts});
 							}else{
 								
-								let userIdArrayForComments = []
-								
+								let userIdArrayForComments = [];
 									for(let j=0; j<user.length; j++){
 										for(let i=0; i<initialPosts.length; i++){
+											
 											if(user[j]._id.toString()==initialPosts[i].postedBy.toString()){
-												initialPosts[i]["postedBy"]=user[j].username;
+												initialPosts[i].postedBy=user[j].username;
+												initialPosts[i].fullName=user[j].fullName;
+												initialPosts[i].profilePic=user[j].profilePic;
 											}
 											
 											let tempArray =[];
@@ -237,6 +239,8 @@ router.get('/timeline/recent/latestPost', authenticate, (req, res) => {
 										for(let i=0; i<recentPosts.length; i++){
 											if(user[j]._id.toString()==recentPosts[i].postedBy.toString()){
 												recentPosts[i]["postedBy"]=user[j].username;
+												recentPosts[i]["fullName"]=user[j].fullName;
+												recentPosts[i]["profilePic"]=user[j].profilePic;
 											}
 											
 											let tempArray =[];
@@ -427,6 +431,8 @@ router.post('/timeline/likes', authenticate, (req, res) => {
 										if(user[j]._id.toString() == likedBy[i].toString()){
 											postLiked[0].likedBy[i]=user[i].username
 											postLiked[0]["triggeredBy"]=triggeredBy
+											postLiked[0]["fullName"]=user[j].fullName
+											postLiked[0]["profilePic"]=user[j].profilePic
 											postLikedObj ={_id: postLiked[0]._id, postedBy: postLiked[0].postedBy,text: postLiked[0].text, likedBy: postLiked[0].likedBy, likes: postLiked[0].likes, commentsCount: postLiked[0].commentsCount, comments: postLiked[0].comments, charCount: postLiked[0].charCount, postDate: postLiked[0].postDate, triggeredBy: triggeredBy}
 										}
 									}										
@@ -489,7 +495,7 @@ router.post('/auth', authenticate, (req, res) => {
 
 router.get('/profile/:username', (req, res) => {
 	const username = req.params.username;
-	
+
 	getUserByUsername(username, (err, user) => {
 		if(err){
 			res.status(500).json({status: "failed"});
@@ -501,7 +507,7 @@ router.get('/profile/:username', (req, res) => {
 				}else{
 					
 					const commentsUserIdArray = []
-					
+
 					for(let i = 0; i < posts.length; i++){
 						for(let j = 0; j < posts[i].comments.length; j++){
 							commentsUserIdArray.push(posts[i].comments[j].user)
@@ -523,8 +529,11 @@ router.get('/profile/:username', (req, res) => {
 								}
 							}						
 							
+							
 							for(let i = 0; i < posts.length; i++){
 								posts[i].postedBy = req.params.username;
+								posts[i].fullName = user.fullName;
+								posts[i].profilePic = user.profilePic;
 							}
 							res.status(200).json({userInfo: user, posts: posts})
 								
@@ -649,6 +658,8 @@ router.get('/notifications', authenticate, (req, res) => {
 										for(let j=0; j<notificationsArray.length; j++){
 											if(notificationsArray[j].triggeredBy.toString()==user[i]._id.toString()){
 												notificationsArray[j]["triggeredBy"]=user[i].username
+												notificationsArray[j]["fullName"]=user[i].fullName
+												notificationsArray[j]["profilePic"]=user[i].profilePic
 											}	
 											
 										}
@@ -707,6 +718,8 @@ router.post('/post/comment', authenticate, (req, res) => {
 					
 					if(userId.toString()==postCommented[0].postedBy.toString()){
 						postCommented[0].postedBy=user.username
+						postCommented[0].fullName=user.fullName
+						postCommented[0].profilePic=user.profilePic
 						let commenterIdArray = []
 						
 						for(let i=0;i<postCommented[0].comments.length;i++){
@@ -786,6 +799,8 @@ router.post('/post/comment', authenticate, (req, res) => {
 									}else{
 										
 										postCommented[0].postedBy=user.username
+										postCommented[0].fullName=user.fullName
+										postCommented[0].profilePic=user.profilePic
 										res.status(200).json({postCommented: postCommented, userId: user._id, triggeredBy: triggeredBy, recentComment: commentObj})
 									}
 								});	
@@ -816,6 +831,19 @@ router.post('/notifications/reset-unread', authenticate, (req, res) => {
 		}else{
 			res.status(200).json({msg: "ok"})
 			// console.log(status);
+		}
+	});
+});
+
+router.post('/profile/update', authenticate, (req, res) => {
+	const userId = req.currentUser._id;
+	const newProfileData = req.body;
+	
+	updateProfileData(userId, newProfileData, (err, userData) => {
+		if(err){
+			res.status(500).json({msg: "error"})
+		}else{
+			res.status(200).json({userData: userData})
 		}
 	});
 });

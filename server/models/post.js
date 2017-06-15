@@ -38,6 +38,12 @@ const PostSchema = mongoose.Schema({
 	},	
 	likedBy: {
 		type: Array
+	},
+	fullName: {
+		type: String,
+	},
+	profilePic: {
+		type: String,
 	}
 });
 

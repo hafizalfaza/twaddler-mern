@@ -18,7 +18,7 @@ class Notification extends React.Component {
   }
 
   render() {
-    const { notificationId, type, date, likedBy, postData, triggeredBy, comment } = this.props.notification;
+    const { notificationId, type, date, likedBy, postData, triggeredBy, comment, profilePic } = this.props.notification;
     const { notificationData } = this.state;
     const currentUser = this.props.auth.user.user.username;
     const followStatement = triggeredBy + ' is now following you';
@@ -44,7 +44,7 @@ class Notification extends React.Component {
 
     const commentNotification = (<div>
       <div className='media well'>
-        <div><img src='http://www.synbio.cam.ac.uk/images/avatar-generic.jpg' className='media-object' style={ { width: 30, display: 'inline-block' } }/>&nbsp;&nbsp;&nbsp;<span><Link to={profileLink}>{ triggeredBy }</Link></span> commented on your post <img src={ commentIcon } style={ { width: 15 } } /></div>
+        <div><img src={ profilePic } className='media-object' style={ { width: 30, display: 'inline-block' } }/>&nbsp;&nbsp;&nbsp;<span><Link to={profileLink}>{ triggeredBy }</Link></span> commented on your post <img src={ commentIcon } style={ { width: 15 } } /></div>
         <div style={ { paddingTop: 20, paddingLeft: 20 } }><p>{ comment }</p></div>
         <div className='media well'>
           <div className='media-left'>

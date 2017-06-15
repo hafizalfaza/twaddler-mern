@@ -111,7 +111,7 @@ export function getUserById(id, callback){
 
 export function getUsernameById(id, callback){	
 	const query = {_id: {$in: id}}
-	const select = {_id: 1, username: 1 }
+	const select = {_id: 1, username: 1, fullName: 1, profilePic: 1}
 	User.find(query, select, callback);
 }
 
@@ -140,4 +140,11 @@ export function getFollowingByCurrentUser(currentUser, callback){
 
 export function resetUnreadNotifications(userId, callback){
 	User.update({_id: userId}, {$set: {unreadNotifications: 0}}, callback)
+}
+
+
+export function updateProfileData(userId, newProfileData, callback){
+	User.update({_id: userId}, {$set: {fullName: newProfileData.fullName, username: newProfileData.username, bio: newProfileData.bio, profilePic: newProfileData.profilePic}}, () => {
+		User.find({_id: userId}, callback);
+	});
 }

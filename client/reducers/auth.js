@@ -1,4 +1,4 @@
-import { SET_CURRENT_USER } from '../actions/types';
+import { SET_CURRENT_USER, UPDATE_CURRENT_USER } from '../actions/types';
 import isEmpty from 'lodash/isEmpty';
 
 const initialState = {
@@ -13,6 +13,15 @@ export default (state = initialState, action = {}) => {
       return {
         isAuthenticated: !isEmpty(action.user),
         user: action.user,
+      };
+    case UPDATE_CURRENT_USER:
+      const newUserDataObj = { ...action.newUserData };
+      return {
+        isAuthenticated: true,
+        user: {
+          ...state.user,
+          user: newUserDataObj,
+        },
       };
     default: return state;
   }

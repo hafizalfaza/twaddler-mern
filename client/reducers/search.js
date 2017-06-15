@@ -10,6 +10,7 @@ export default (state = [], action = {}) => {
           fullName: action.searchResultData.fullName,
           username: action.searchResultData.username,
           bio: action.searchResultData.bio,
+          profilePic: action.searchResultData.profilePic,
           following: action.searchResultData.following,
           followers: action.searchResultData.followers,
         },
