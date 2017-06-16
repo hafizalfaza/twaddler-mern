@@ -90,8 +90,8 @@ class SearchResult extends React.Component {
             <img src={ profilePic } style={ { width: 100 } }/>
           </div>
           <div className='media-body'>
-            <h4 className='media-heading'><a href='#' name={ username } onClick={ this.clickUser }>{ username }</a>&nbsp;&nbsp;&nbsp;&nbsp;<button name={ id } onClick={ this.followRequest } onMouseEnter={ this.hoverToFollowButton } onMouseLeave={ this.leaveButton } className={ following ? buttonStyle.class : 'btn btn-primary btn-sm' } disabled={ isLoading }>{ following ? buttonStyle.text : '+ Follow' }</button></h4>
-            <h5>{ fullName }&nbsp;&nbsp;&nbsp;&nbsp;{ followed ? followsYou : false }</h5>
+            <h4 className='media-heading'><a href='#' name={ username } onClick={ this.clickUser }>@{ username }</a>&nbsp;&nbsp;&nbsp;&nbsp;<button name={ id } onClick={ this.followRequest } onMouseEnter={ this.hoverToFollowButton } onMouseLeave={ this.leaveButton } className={ following ? buttonStyle.class : 'btn btn-primary btn-sm' } disabled={ isLoading }>{ following ? buttonStyle.text : '+ Follow' }</button></h4>
+            <h5 style={ { fontWeight: 'bold' } }>{ fullName }&nbsp;&nbsp;&nbsp;&nbsp;<span style={ { fontWeight: 'normal' } }>{ followed ? followsYou : false }</span></h5>
             <p>{ bio }</p>
           </div>
         </div>

@@ -16,6 +16,9 @@ export const NotificationSchema = mongoose.Schema({
 	},
 	follow: {
 		type: Array
+	},
+	mention: {
+		type: Array
 	}
 	
 });
@@ -61,6 +64,22 @@ export function addNotificationToDB(item , triggeredBy, activityType, additional
 			});		
 		}
 	}
+	
+	if(activityType==="USER_MENTION") {
+		
+		for(let i = item.mentionedUserArray.length-1; i >=0; i-- ){
+			if(item.mentionedUserArray[i].toString() === triggeredBy.toString()){
+				item.mentionedUserArray.splice(i, 1);
+			}
+		}
+		const notificationData = {notificationId: notificationId, type: activityType, triggeredBy: triggeredBy, postId: item.postId, date: new Date().toISOString()}
+
+		User.update({_id: {$in: item.mentionedUserArray}}, {$inc: {unreadNotifications: 1}}, () => {
+			Notification.update({userNotificationId: {$in : item.mentionedUserArray}}, {$addToSet: {mention: notificationData}}, callback);
+		});		
+		
+	}
+	
 }
 
 

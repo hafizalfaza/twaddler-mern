@@ -103,6 +103,12 @@ export function getUserByUsername(username, callback){
 	User.findOne(query, callback);
 }
 
+export function getUsersByUsername(usernames, callback){
+	const query = {username: {$in: usernames}};
+	
+	User.find(query, callback);
+}
+
 export function getUserById(id, callback){	
 	const query = {_id: id}
 	const select = {password:0, __v:0, }

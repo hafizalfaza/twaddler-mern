@@ -87,8 +87,6 @@ class Notification extends React.Component {
     const profileLink = `/profile/${triggeredBy}`;
     const currentUserProfileLink = `/profile/${currentUser}`;
 
-    console.log('date coy: ' + this.convertDate(date));
-
     const likeNotification = (<div>
       <div className='media well'>
         <div><img src={ profilePic ? profilePic : null } className='media-object' style={ { width: 30, display: 'inline-block' } }/>&nbsp;&nbsp;&nbsp;<span><Link to={ profileLink }>{ triggeredBy }</Link></span> liked this post <img src={ loveOn } style={ { width: 15 } } />&nbsp;&bull;&nbsp;
@@ -126,7 +124,9 @@ class Notification extends React.Component {
 
     const followNotification = (<div>
       <div className='media well'>
-        <div><img src={ profilePic } className='media-object' style={ { width: 30, display: 'inline-block' } }/>&nbsp;&nbsp;<span><Link to={ profileLink }>{ triggeredBy }</Link></span> started following you <img src={ follow } style={ { width: 40 } } /></div>
+        <div><img src={ profilePic } className='media-object' style={ { width: 30, display: 'inline-block' } }/>&nbsp;&nbsp;<span><Link to={ profileLink }>{ triggeredBy }</Link></span> started following you <img src={ follow } style={ { width: 40 } } />&nbsp;&bull;&nbsp;
+          <span style={ { color: 'gray', fontSize: 12 } }>{ this.convertDate(date) }</span>
+        </div>
       </div>
     </div>);
 

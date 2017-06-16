@@ -28,6 +28,15 @@ class UserProfile extends React.Component {
     );
   }
 
+  componentWillReceiveProps(nextProps) {
+    if (this.props.match.params.username !== nextProps.match.params.username) {
+      const username = nextProps.match.params.username;
+      this.props.getProfileData(username).then(
+        res => this.props.setProfileData(res.data)
+      );
+    }
+  }
+
   editProfile(e) {
     e.preventDefault();
     const { fullName, username, bio, profilePic } = this.props.profileData.userInfo;

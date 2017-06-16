@@ -23,6 +23,7 @@ class InitialPost extends React.Component {
     this.onClickComment = this.onClickComment.bind(this);
     this.onTypingComment = this.onTypingComment.bind(this);
     this.onPostComment = this.onPostComment.bind(this);
+    this.transpileText = this.transpileText.bind(this);
   }
 
   componentWillMount() {
@@ -100,6 +101,22 @@ class InitialPost extends React.Component {
     }
   }
 
+  transpileText(text) {
+    const phraseArray = [];
+    const textSplit = text.split(' ');
+    for (let i = 0; i < textSplit.length; i++) {
+      if (textSplit[i][0] !== '@') {
+        phraseArray.push(textSplit[i]);
+        phraseArray.push(' ');
+      } else {
+        const key = Math.random().toString(36).slice(2);
+        phraseArray.push(<Link key={ key }to={ `/profile/${textSplit[i].slice(1, textSplit[i].length)}` }>{ textSplit[i] }</Link>);
+        phraseArray.push(' ');
+      }
+    }
+    return phraseArray;
+  }
+
   render() {
     const { _id, postedBy, fullName, text, postDate, likes, likedBy, commentsCount, profilePic } = this.props.initialPost;
     const { comments } = this.props;
@@ -153,10 +170,10 @@ class InitialPost extends React.Component {
             <img src={ profilePic } className="media-object" style={ { width: 50 } }/>
           </div>
           <div className="media-body">
-            <h4 className="media-heading"><Link to= { profileLink } style={ { fontSize: 15 } }>@{ postedBy }</Link>&nbsp;<span style={ { fontSize: 13 } }>{ fullName }</span>&nbsp;&bull;&nbsp;
+            <h4 className="media-heading"><Link to= { profileLink } style={ { fontSize: 15, fontWeight: 'bold' } }>@{ postedBy }</Link>&nbsp;<span style={ { fontSize: 13, color: 'gray' } }>{ fullName }</span>&nbsp;&bull;&nbsp;
               <span style={ { fontSize: 12, color: 'gray' } }>{ second >= 1 && minute < 1 ? secondStatement : minute >= 1 && hour < 1 ? minuteStatement : hour >= 1 && day < 1 ? hourStatement : day >= 1 && week < 1 ? dayStatement : recentStatement }</span>
             </h4>
-            <p>{ text }</p>
+            <p>{ this.transpileText(text) ? this.transpileText(text) : text }</p>
             <div className="pull-left">
               <a href="#" onClick={ this.onClickComment } style={ { textDecoration: 'none' } }><span ><img src={ comment } style={ { width: 14 } }/></span></a>&nbsp;<span>{ commentsCount }</span>
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;

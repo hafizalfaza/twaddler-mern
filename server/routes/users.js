@@ -2,7 +2,7 @@ import express from 'express';
 import authenticate from '../middlewares/authenticate';
 import validateInput from '../shared/validations/userPostValidations';
 import {addCommentToDB, getInitialPostsByCurrentUser, getRecentPostsByCurrentUser, getPostsForProfile, addPostToDB, Post, getPostByPostId, addUserToPostLikes} from '../models/post';
-import {getUserById, getUsernameById, getFollowingByCurrentUser, requestToFollow, getUserByUsername, resetUnreadNotifications, updateProfileData} from '../models/user';
+import {getUserById, getUsernameById, getUsersByUsername, getFollowingByCurrentUser, requestToFollow, getUserByUsername, resetUnreadNotifications, updateProfileData} from '../models/user';
 import {addNotificationToDB, getNotificationsByUserId, incrementUnreadNotifications} from '../models/notification';
 import {$,jQuery} from 'jquery';
 
@@ -10,7 +10,7 @@ const router = express.Router();
 
 
 
-//User post update
+//User post content
 
 router.post('/post', authenticate, (req, res) => {
 	const user = req.currentUser._id;
@@ -30,9 +30,57 @@ router.post('/post', authenticate, (req, res) => {
 			if(err){
 				res.status(500).json({success: false, msg: "Internal server error"});
 			}else{
-				res.status(200).json({post: post});
+
+				let mentionedUserArray = [];
+		
+				for (let i = 0; i < newPost.text.length; i++){
+					if(newPost.text[i]==='@'){
+						for(let j = i+1; j < newPost.text.length; j++){
+							if(newPost.text[j]===' '){
+								mentionedUserArray.push(newPost.text.slice(i+1, j));
+								break;
+							}
+							if(j===newPost.text.length-1){
+								mentionedUserArray.push(newPost.text.slice(i+1, newPost.text.length));
+								break;
+							}
+						}
+					}
+				}
+				
+				
+				getUsersByUsername(mentionedUserArray, (err, users) => {
+					if(err){
+						res.status(500).json({msg: 'error'})
+					}else{
+						for(let i = 0; i < users.length; i++){
+							for(let j = 0; j < mentionedUserArray.length; j++){
+								if(mentionedUserArray[j]===users[i].username){
+									mentionedUserArray[j]=users[i]._id;
+								}
+							}
+						}
+						
+						const activityType = "USER_MENTION";
+						const additionalId = '';
+
+						const data = {postId: post._id, mentionedUserArray}
+						
+						addNotificationToDB(data, user, activityType, additionalId, (err, notification) => {
+							if(err){
+								res.status(500).json({msg: "Error"})
+							}else{
+								console.log(notification);
+							}
+						});
+						
+						res.status(200).json({post: post});	
+					}
+				});
 			}
 		});
+		
+		
 	}	
 });
 
