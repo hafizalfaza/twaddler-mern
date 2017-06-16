@@ -31,7 +31,7 @@ class InitialPost extends React.Component {
   }
 
   assignLikeStatus() {
-    if (this.props.auth) {
+    if (this.props.user) {
       const isLikedByCurrentUser = $.inArray(this.props.user.user.username, this.props.initialPost.likedBy);
       if (isLikedByCurrentUser === -1) {
         this.setState({ liked: false, numberOfLikes: this.props.initialPost.likes });

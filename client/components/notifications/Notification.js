@@ -29,10 +29,10 @@ class Notification extends React.Component {
     const currentUserProfileLink = `/profile/${currentUser}`;
     const likeNotification = (<div>
       <div className='media well'>
-        <div><img src='http://www.synbio.cam.ac.uk/images/avatar-generic.jpg' className='media-object' style={ { width: 30, display: 'inline-block' } }/>&nbsp;&nbsp;&nbsp;<span><Link to={ profileLink }>{ triggeredBy }</Link></span> liked this post <img src={ loveOn } style={ { width: 15 } } /></div>
+        <div><img src={ profilePic ? profilePic : null } className='media-object' style={ { width: 30, display: 'inline-block' } }/>&nbsp;&nbsp;&nbsp;<span><Link to={ profileLink }>{ triggeredBy }</Link></span> liked this post <img src={ loveOn } style={ { width: 15 } } /></div>
         <div className='media well'>
           <div className='media-left'>
-            <img src='http://www.synbio.cam.ac.uk/images/avatar-generic.jpg' className='media-object' style={ { width: 50 } } />
+            <img src={ postData ? postData.profilePic : null } className='media-object' style={ { width: 50 } } />
           </div>
           <div className='media-body'>
             <h4 className='media-heading'><Link to={currentUserProfileLink}>{currentUser}</Link>&nbsp;&nbsp;&nbsp;&nbsp;<span style={ { fontSize: 10 } }>{ notificationData.postDate }</span></h4>
@@ -48,7 +48,7 @@ class Notification extends React.Component {
         <div style={ { paddingTop: 20, paddingLeft: 20 } }><p>{ comment }</p></div>
         <div className='media well'>
           <div className='media-left'>
-            <img src='http://www.synbio.cam.ac.uk/images/avatar-generic.jpg' className='media-object' style={ { width: 50 } }/>
+            <img src={ postData ? postData.profilePic : null } className='media-object' style={ { width: 50 } }/>
           </div>
           <div className='media-body'>
             <h4 className='media-heading'><Link to={ currentUserProfileLink }>{ currentUser }</Link>&nbsp;&nbsp;&nbsp;&nbsp;<span style={ { fontSize: 10 } }>{ notificationData.postDate }</span></h4>
@@ -60,7 +60,7 @@ class Notification extends React.Component {
 
     const followNotification = (<div>
       <div className='media well'>
-        <div><img src='http://www.synbio.cam.ac.uk/images/avatar-generic.jpg' className='media-object' style={ { width: 30, display: 'inline-block' } }/>&nbsp;&nbsp;<span><Link to={ profileLink }>{ triggeredBy }</Link></span> started following you <img src={ follow } style={ { width: 40 } } /></div>
+        <div><img src={ profilePic } className='media-object' style={ { width: 30, display: 'inline-block' } }/>&nbsp;&nbsp;<span><Link to={ profileLink }>{ triggeredBy }</Link></span> started following you <img src={ follow } style={ { width: 40 } } /></div>
       </div>
     </div>);
 
