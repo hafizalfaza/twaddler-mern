@@ -144,7 +144,7 @@ export function resetUnreadNotifications(userId, callback){
 
 
 export function updateProfileData(userId, newProfileData, callback){
-	User.update({_id: userId}, {$set: {fullName: newProfileData.fullName, username: newProfileData.username, bio: newProfileData.bio, profilePic: newProfileData.profilePic}}, () => {
+	User.update({_id: userId}, {$set: {fullName: newProfileData.fullName, bio: newProfileData.bio, profilePic: newProfileData.profilePic}}, () => {
 		User.find({_id: userId}, callback);
 	});
 }

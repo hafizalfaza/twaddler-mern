@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { SET_PROFILE_DATA } from './types';
+import { SET_PROFILE_DATA, UPDATE_PROFILE_DATA } from './types';
 
 // Get user information for profile
 export function getProfileData(username) {
@@ -21,3 +21,9 @@ export function updateProfileData(newUserData) {
   };
 }
 
+export function storeNewProfileData(newProfileData) {
+  return {
+    type: UPDATE_PROFILE_DATA,
+    newProfileData,
+  };
+}

@@ -9,6 +9,7 @@ class Notification extends React.Component {
     this.state = {
       notificationData: {},
     };
+    this.convertDate = this.convertDate.bind(this);
   }
 
   componentWillMount() {
@@ -17,9 +18,67 @@ class Notification extends React.Component {
     }
   }
 
+  convertDate(date) {
+    let correctDate = '';
+
+    const convertedPostDate = new Date(date);
+    const currentDate = new Date();
+
+    const second = (currentDate - convertedPostDate) / 1000;
+    const minute = second / 60;
+    const hour = minute / 60;
+    const day = hour / 24;
+    const week = day / 7;
+    const month = week / 30;
+    const year = month / 12;
+
+    const secondStatement = Math.floor(second) + 's';
+    const minuteStatement = Math.floor(minute) + 'm';
+    const hourStatement = Math.floor(hour) + 'h';
+    const dayStatement = Math.floor(day) + 'd';
+    const weekStatement = Math.floor(week) + 'w';
+    const monthStatement = Math.floor(month) + 'mo';
+    const yearStatement = Math.floor(year) + 'y';
+    const recentStatement = 'a moment ago';
+
+    if (second >= 1 && minute < 1) {
+      correctDate = secondStatement;
+    }
+
+    if (minute >= 1 && hour < 1) {
+      correctDate = minuteStatement;
+    }
+
+    if (hour >= 1 && day < 1) {
+      correctDate = hourStatement;
+    }
+
+    if (day >= 1 && week < 1) {
+      correctDate = dayStatement;
+    }
+
+    if (week >= 1 && month < 1) {
+      correctDate = weekStatement;
+    }
+
+    if (month >= 1 && year < 1) {
+      correctDate = monthStatement;
+    }
+
+    if (year > 1) {
+      correctDate = yearStatement;
+    }
+
+    if (second < 1) {
+      correctDate = 'a moment ago';
+    }
+
+    return correctDate;
+  }
+
+
   render() {
     const { notificationId, type, date, likedBy, postData, triggeredBy, comment, profilePic } = this.props.notification;
-    const { notificationData } = this.state;
     const currentUser = this.props.auth.user.user.username;
     const followStatement = triggeredBy + ' is now following you';
     const loveOn = require('./love_on.png');
@@ -27,15 +86,20 @@ class Notification extends React.Component {
     const follow = require('./follow.png');
     const profileLink = `/profile/${triggeredBy}`;
     const currentUserProfileLink = `/profile/${currentUser}`;
+
+    console.log('date coy: ' + this.convertDate(date));
+
     const likeNotification = (<div>
       <div className='media well'>
-        <div><img src={ profilePic ? profilePic : null } className='media-object' style={ { width: 30, display: 'inline-block' } }/>&nbsp;&nbsp;&nbsp;<span><Link to={ profileLink }>{ triggeredBy }</Link></span> liked this post <img src={ loveOn } style={ { width: 15 } } /></div>
+        <div><img src={ profilePic ? profilePic : null } className='media-object' style={ { width: 30, display: 'inline-block' } }/>&nbsp;&nbsp;&nbsp;<span><Link to={ profileLink }>{ triggeredBy }</Link></span> liked this post <img src={ loveOn } style={ { width: 15 } } />&nbsp;&bull;&nbsp;
+          <span style={ { color: 'gray', fontSize: 12 } }>{ this.convertDate(date) }</span>
+        </div>
         <div className='media well'>
           <div className='media-left'>
             <img src={ postData ? postData.profilePic : null } className='media-object' style={ { width: 50 } } />
           </div>
           <div className='media-body'>
-            <h4 className='media-heading'><Link to={currentUserProfileLink}>{currentUser}</Link>&nbsp;&nbsp;&nbsp;&nbsp;<span style={ { fontSize: 10 } }>{ notificationData.postDate }</span></h4>
+            <h4 className='media-heading'><Link to={currentUserProfileLink}>{currentUser}</Link>&nbsp;&bull;&nbsp;<span style={ { color: 'gray', fontSize: 12 } }>{ postData ? this.convertDate(postData.postDate) : null }</span></h4>
             { postData ? postData.text : null }
           </div>
         </div>
@@ -44,14 +108,16 @@ class Notification extends React.Component {
 
     const commentNotification = (<div>
       <div className='media well'>
-        <div><img src={ profilePic } className='media-object' style={ { width: 30, display: 'inline-block' } }/>&nbsp;&nbsp;&nbsp;<span><Link to={profileLink}>{ triggeredBy }</Link></span> commented on your post <img src={ commentIcon } style={ { width: 15 } } /></div>
+        <div><img src={ profilePic } className='media-object' style={ { width: 30, display: 'inline-block' } }/>&nbsp;&nbsp;&nbsp;<span><Link to={profileLink}>{ triggeredBy }</Link></span> commented on your post <img src={ commentIcon } style={ { width: 15 } } />&nbsp;&bull;&nbsp;
+          <span style={ { color: 'gray', fontSize: 12 } }>{ this.convertDate(date) }</span>
+        </div>
         <div style={ { paddingTop: 20, paddingLeft: 20 } }><p>{ comment }</p></div>
         <div className='media well'>
           <div className='media-left'>
             <img src={ postData ? postData.profilePic : null } className='media-object' style={ { width: 50 } }/>
           </div>
           <div className='media-body'>
-            <h4 className='media-heading'><Link to={ currentUserProfileLink }>{ currentUser }</Link>&nbsp;&nbsp;&nbsp;&nbsp;<span style={ { fontSize: 10 } }>{ notificationData.postDate }</span></h4>
+            <h4 className='media-heading'><Link to={ currentUserProfileLink }>{ currentUser }</Link>&nbsp;&bull;&nbsp;<span style={ { color: 'gray', fontSize: 12 } }>{ postData ? this.convertDate(postData.postDate) : null }</span></h4>
             { postData ? postData.text : null }
           </div>
         </div>

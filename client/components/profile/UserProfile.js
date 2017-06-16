@@ -2,8 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import NavigationBar from '../NavigationBar';
-import { getProfileData, setProfileData, updateProfileData } from '../../actions/profileActions';
-import { updateCurrentUser } from '../../actions/loginActions';
+import { getProfileData, setProfileData, updateProfileData, storeNewProfileData } from '../../actions/profileActions';
 import NewsfeedTimeline from '../newsfeed/NewsfeedTimeline';
 
 class UserProfile extends React.Component {
@@ -54,14 +53,14 @@ class UserProfile extends React.Component {
   }
 
   onSaveChange() {
-    const newProfileData = { fullName: this.state.fullName, username: this.state.username, bio: this.state.bio, profilePic: this.state.profilePic };
+    const newProfileData = { fullName: this.state.fullName, bio: this.state.bio, profilePic: this.state.profilePic };
     this.props.updateProfileData(newProfileData)
-      .then((res) => { this.props.updateCurrentUser(res.data.userData[0]); })
-      .then(() => {
-        this.setState({ editProfileActive: false });
-        this.context.router.history.push(`/profile/${this.state.username}`);
-      })
-      .catch(err => console.log('error'));
+      .then(
+        (res) => {
+          this.props.storeNewProfileData(newProfileData);
+          this.setState({ editProfileActive: false });
+        }
+      );
   }
 
   onCancel() {
@@ -84,7 +83,6 @@ class UserProfile extends React.Component {
       const username = (<span style={ { fontSize: 17 } }>@{ userInfo.username }</span>);
       const bio = (<span style={ { fontSize: 15 } }>{ userInfo.bio }</span>);
       const editFullName = (<input type='text' name='fullName' value={ this.state.fullName } onChange={ this.onTyping } autoFocus/>);
-      const editUsername = (<input type='text' name='username' value={ this.state.username } onChange={ this.onTyping }/>);
       const editBio = (<input type='text' name='bio' value={ this.state.bio } onChange={ this.onTyping } placeholder='Type your bio'/>);
       const editProfilePic = (<input type='text' name='profilePic' value={ this.state.profilePic } onChange={ this.onTyping } placeholder='Paste picture url'/>);
       const followButton = (
@@ -113,7 +111,7 @@ class UserProfile extends React.Component {
                     <div className='profile-usertitle-name text-center'>
                       <div style={ { padding: 8 } }>
                         <div>{ editProfileActive ? editFullName : fullName }</div>
-                        <div>{ editProfileActive ? editUsername : username }</div>
+                        <div>{ username }</div>
                         <div>{ editProfileActive ? editBio : bio }</div>
                         <div>{ editProfileActive ? editProfilePic : null }</div>
                       </div>
@@ -177,4 +175,4 @@ function mapStateToProps(state) {
   };
 }
 
-export default connect(mapStateToProps, { getProfileData, setProfileData, updateProfileData, updateCurrentUser })(UserProfile);
+export default connect(mapStateToProps, { getProfileData, setProfileData, updateProfileData, storeNewProfileData })(UserProfile);
