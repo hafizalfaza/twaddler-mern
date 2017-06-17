@@ -607,7 +607,8 @@ router.get('/notifications', authenticate, (req, res) => {
 			const likeNotifications = notifications[0].like;
 			const followNotifications = notifications[0].follow;
 			const commentNotifications = notifications[0].comment;
-			
+			const mentionNotifications = notifications[0].mention;
+
 			let notificationsArray = []
 			
 			
@@ -630,12 +631,7 @@ router.get('/notifications', authenticate, (req, res) => {
 							res.status(500).json({msg: 'error'})
 						}else{
 							
-							
-							
-							
-							
-							
-							
+					
 							for(let x=0; x<posts.length; x++){
 								for(let y=0; y<likeNotifications.length; y++){
 									if(posts[x]._id.toString()==likeNotifications[y].postId.toString()){
@@ -693,64 +689,84 @@ router.get('/notifications', authenticate, (req, res) => {
 											
 										}
 									}
-								
-										
-
 									
+									const mentionPostId = [];
 									
-									for(let i=0; i<commentNotifications.length; i++){
-										notificationsArray.push(commentNotifications[i])
-									}
-							
-
-									for(let j=0; j<followNotifications.length; j++){
-										notificationsArray.push(followNotifications[j])
-									}	
-
-									let userIdArray = []
-									
-									for(let i=0; i<notificationsArray.length; i++){
-										userIdArray.push(notificationsArray[i].triggeredBy);
+									for(let i = 0; i < mentionNotifications.length; i++){
+										mentionPostId.push(mentionNotifications[i].postId);
 									}
 									
 									
-									
-									getUsernameById(userIdArray, (err, user) => {
+									getPostByPostId(mentionPostId, (err, mentionPosts) =>{
 										if(err){
 											res.status(500).json({msg: "Error"})
-										}else{
-											for(let i=0; i<user.length; i++){
-												for(let j=0; j<notificationsArray.length; j++){
-													if(notificationsArray[j].triggeredBy.toString()==user[i]._id.toString()){
-														notificationsArray[j]["triggeredBy"]=user[i].username
-														notificationsArray[j]["fullName"]=user[i].fullName
-														notificationsArray[j]["profilePic"]=user[i].profilePic
-													}	
-													
-												}
-																			
+										}else{		
+											
+											
+											for(let x=0; x < mentionPosts.length; x++){
+												mentionNotifications[x].postData=mentionPosts[x];
 											}
-
-											function compare(a,b) {
-											  if (a.date < b.date)
-												return 1;
-											  if (a.date > b.date)
-												return -1;
-											  return 0;
+											
+											for(let i=0; i<commentNotifications.length; i++){
+												notificationsArray.push(commentNotifications[i])
 											}
 									
-											notificationsArray.sort(compare);
-											
-											
-											
-											const notificationsData = {notifications: notificationsArray, unreadNotifications: req.currentUser.unreadNotifications}
-											
-											
-											
-											res.status(200).json({notifications: notificationsData})
-										}
-									});
 
+											for(let j=0; j<followNotifications.length; j++){
+												notificationsArray.push(followNotifications[j]);												
+											}	
+											
+											for(let k=0; k<mentionNotifications.length; k++){
+
+												notificationsArray.push(mentionNotifications[k])
+											}	
+											
+											
+											let userIdArray = []
+											
+											for(let i=0; i<notificationsArray.length; i++){
+												userIdArray.push(notificationsArray[i].triggeredBy);
+											}
+											
+											
+											
+											getUsernameById(userIdArray, (err, user) => {
+												if(err){
+													res.status(500).json({msg: "Error"})
+												}else{
+													for(let i=0; i<user.length; i++){
+														for(let j=0; j<notificationsArray.length; j++){
+															if(notificationsArray[j].triggeredBy.toString()==user[i]._id.toString()){
+																notificationsArray[j]["triggeredBy"]=user[i].username
+																notificationsArray[j]["fullName"]=user[i].fullName
+																notificationsArray[j]["profilePic"]=user[i].profilePic
+															}	
+															
+														}
+																					
+													}
+
+													function compare(a,b) {
+													  if (a.date < b.date)
+														return 1;
+													  if (a.date > b.date)
+														return -1;
+													  return 0;
+													}
+											
+													notificationsArray.sort(compare);
+													
+													
+													
+													const notificationsData = {notifications: notificationsArray, unreadNotifications: req.currentUser.unreadNotifications}
+													
+													
+													
+													res.status(200).json({notifications: notificationsData})
+												}
+											});
+										}	
+									});
 								}
 							});
 					

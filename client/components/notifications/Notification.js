@@ -10,12 +10,29 @@ class Notification extends React.Component {
       notificationData: {},
     };
     this.convertDate = this.convertDate.bind(this);
+    this.transpileText = this.transpileText.bind(this);
   }
 
   componentWillMount() {
     if (this.props.notification.postData) {
       this.setState({ notificationData: this.props.notification.postData });
     }
+  }
+
+  transpileText(text) {
+    const phraseArray = [];
+    const textSplit = text.split(' ');
+    for (let i = 0; i < textSplit.length; i++) {
+      if (textSplit[i][0] !== '@') {
+        phraseArray.push(textSplit[i]);
+        phraseArray.push(' ');
+      } else {
+        const key = Math.random().toString(36).slice(2);
+        phraseArray.push(<Link key={ key }to={ `/profile/${textSplit[i].slice(1, textSplit[i].length)}` }>{ textSplit[i] }</Link>);
+        phraseArray.push(' ');
+      }
+    }
+    return phraseArray;
   }
 
   convertDate(date) {
@@ -88,51 +105,68 @@ class Notification extends React.Component {
     const currentUserProfileLink = `/profile/${currentUser}`;
 
     const likeNotification = (<div>
-      <div className='media well'>
+      <div className='media well' style={ { marginBottom: 0 } }>
         <div><img src={ profilePic ? profilePic : null } className='media-object' style={ { width: 30, display: 'inline-block' } }/>&nbsp;&nbsp;&nbsp;<span><Link to={ profileLink }>{ triggeredBy }</Link></span> liked this post <img src={ loveOn } style={ { width: 15 } } />&nbsp;&bull;&nbsp;
           <span style={ { color: 'gray', fontSize: 12 } }>{ this.convertDate(date) }</span>
         </div>
         <div className='media well'>
           <div className='media-left'>
-            <img src={ postData ? postData.profilePic : null } className='media-object' style={ { width: 50 } } />
+            <img src={ postData ? postData.profilePic : null } className='media-object img-rounded' style={ { width: 50 } } />
           </div>
           <div className='media-body'>
             <h4 className='media-heading'><Link to={currentUserProfileLink}>{currentUser}</Link>&nbsp;&bull;&nbsp;<span style={ { color: 'gray', fontSize: 12 } }>{ postData ? this.convertDate(postData.postDate) : null }</span></h4>
-            { postData ? postData.text : null }
+            { postData ? this.transpileText(postData.text) : null }
           </div>
         </div>
       </div>
     </div>);
 
     const commentNotification = (<div>
-      <div className='media well'>
+      <div className='media well' style={ { marginBottom: 0 } }>
         <div><img src={ profilePic } className='media-object' style={ { width: 30, display: 'inline-block' } }/>&nbsp;&nbsp;&nbsp;<span><Link to={profileLink}>{ triggeredBy }</Link></span> commented on your post <img src={ commentIcon } style={ { width: 15 } } />&nbsp;&bull;&nbsp;
           <span style={ { color: 'gray', fontSize: 12 } }>{ this.convertDate(date) }</span>
         </div>
         <div style={ { paddingTop: 20, paddingLeft: 20 } }><p>{ comment }</p></div>
         <div className='media well'>
           <div className='media-left'>
-            <img src={ postData ? postData.profilePic : null } className='media-object' style={ { width: 50 } }/>
+            <img src={ postData ? postData.profilePic : null } className='media-object img-rounded' style={ { width: 50 } }/>
           </div>
           <div className='media-body'>
             <h4 className='media-heading'><Link to={ currentUserProfileLink }>{ currentUser }</Link>&nbsp;&bull;&nbsp;<span style={ { color: 'gray', fontSize: 12 } }>{ postData ? this.convertDate(postData.postDate) : null }</span></h4>
-            { postData ? postData.text : null }
+            { postData ? this.transpileText(postData.text) : null }
           </div>
         </div>
       </div>
     </div>);
 
     const followNotification = (<div>
-      <div className='media well'>
+      <div className='media well' style={ { marginBottom: 0 } }>
         <div><img src={ profilePic } className='media-object' style={ { width: 30, display: 'inline-block' } }/>&nbsp;&nbsp;<span><Link to={ profileLink }>{ triggeredBy }</Link></span> started following you <img src={ follow } style={ { width: 40 } } />&nbsp;&bull;&nbsp;
           <span style={ { color: 'gray', fontSize: 12 } }>{ this.convertDate(date) }</span>
         </div>
       </div>
     </div>);
 
+    const mentionNotification = (<div>
+      <div className='media well' style={ { marginBottom: 0 } }>
+        <div><img src={ profilePic } className='media-object' style={ { width: 30, display: 'inline-block' } }/>&nbsp;&nbsp;&nbsp;<span><Link to={profileLink}>{ triggeredBy }</Link></span> mentioned you on a post <img src={ commentIcon } style={ { width: 15 } } />&nbsp;&bull;&nbsp;
+          <span style={ { color: 'gray', fontSize: 12 } }>{ this.convertDate(date) }</span>
+        </div>
+        <div className='media well'>
+          <div className='media-left'>
+            <img src={ profilePic } className='media-object img-rounded' style={ { width: 50 } }/>
+          </div>
+          <div className='media-body'>
+            <h4 className='media-heading'><Link to={ `/profile/${triggeredBy}` }>{ triggeredBy }</Link>&nbsp;&bull;&nbsp;<span style={ { color: 'gray', fontSize: 12 } }>{ postData ? this.convertDate(postData.postDate) : null }</span></h4>
+            { postData ? this.transpileText(postData.text) : null }
+          </div>
+        </div>
+      </div>
+    </div>);
+
     return (
       <div>
-        { type === 'POST_LIKE' ? likeNotification : type === 'POST_COMMENT' ? commentNotification : type === 'FOLLOW' ? followNotification : null }
+        { type === 'POST_LIKE' ? likeNotification : type === 'POST_COMMENT' ? commentNotification : type === 'FOLLOW' ? followNotification : type === 'USER_MENTION' ? mentionNotification : null }
       </div>
     );
   }

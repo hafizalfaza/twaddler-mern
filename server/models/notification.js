@@ -75,7 +75,7 @@ export function addNotificationToDB(item , triggeredBy, activityType, additional
 		const notificationData = {notificationId: notificationId, type: activityType, triggeredBy: triggeredBy, postId: item.postId, date: new Date().toISOString()}
 
 		User.update({_id: {$in: item.mentionedUserArray}}, {$inc: {unreadNotifications: 1}}, () => {
-			Notification.update({userNotificationId: {$in : item.mentionedUserArray}}, {$addToSet: {mention: notificationData}}, callback);
+			Notification.updateMany({userNotificationId: {$in : item.mentionedUserArray}}, {$addToSet: {mention: notificationData}}, callback);
 		});		
 		
 	}
@@ -84,7 +84,7 @@ export function addNotificationToDB(item , triggeredBy, activityType, additional
 
 
 export function getNotificationsByUserId(userId, callback){
-	Notification.find({userNotificationId: userId}, {_id: 0, like: 1, follow: 1, comment: 1}, callback)
+	Notification.find({userNotificationId: userId}, {_id: 0, like: 1, follow: 1, comment: 1, mention: 1}, callback)
 }
 
 export function incrementUnreadNotifications(userId, callback){

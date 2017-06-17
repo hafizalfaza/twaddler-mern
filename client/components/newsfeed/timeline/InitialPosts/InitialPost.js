@@ -165,9 +165,9 @@ class InitialPost extends React.Component {
 
     return (
       <div>
-        <div className="media well" style={ { paddingBottom: 10 } }>
+        <div className="media well" style={ { marginBottom: 0 } }>
           <div className="media-left">
-            <img src={ profilePic } className="media-object" style={ { width: 50 } }/>
+            <img src={ profilePic } className="media-object img-rounded" style={ { width: 50 } }/>
           </div>
           <div className="media-body">
             <h4 className="media-heading"><Link to= { profileLink } style={ { fontSize: 15, fontWeight: 'bold' } }>@{ postedBy }</Link>&nbsp;<span style={ { fontSize: 13, color: 'gray' } }>{ fullName }</span>&nbsp;&bull;&nbsp;
