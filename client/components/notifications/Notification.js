@@ -100,6 +100,7 @@ class Notification extends React.Component {
     const followStatement = triggeredBy + ' is now following you';
     const loveOn = require('./love_on.png');
     const commentIcon = require('./comment.png');
+    const mentionIcon = require('./mention.png');
     const follow = require('./follow.png');
     const profileLink = `/profile/${triggeredBy}`;
     const currentUserProfileLink = `/profile/${currentUser}`;
@@ -149,7 +150,7 @@ class Notification extends React.Component {
 
     const mentionNotification = (<div>
       <div className='media well' style={ { marginBottom: 0 } }>
-        <div><img src={ profilePic } className='media-object' style={ { width: 30, display: 'inline-block' } }/>&nbsp;&nbsp;&nbsp;<span><Link to={profileLink}>{ triggeredBy }</Link></span> mentioned you on a post <img src={ commentIcon } style={ { width: 15 } } />&nbsp;&bull;&nbsp;
+        <div><img src={ profilePic } className='media-object' style={ { width: 30, display: 'inline-block' } }/>&nbsp;&nbsp;&nbsp;<span><Link to={profileLink}>{ triggeredBy }</Link></span> mentioned you in a post <img src={ mentionIcon } style={ { width: 15 } } />&nbsp;&bull;&nbsp;
           <span style={ { color: 'gray', fontSize: 12 } }>{ this.convertDate(date) }</span>
         </div>
         <div className='media well'>

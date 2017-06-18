@@ -15,7 +15,9 @@ class NotificationsList extends React.Component {
   }
 
   render() {
-    if (this.props.notifications.notifications) {
+    if (this.props.notifications.notifications.length === 0) {
+      return (<div className='text-center' ><h1 style={ { color: 'gray' } }>No Notification</h1></div>);
+    } else {
       const notifications = this.props.notifications.notifications.map(notification =>
         <Notification key={ notification.notificationId } notification={ notification } />
       );
@@ -24,8 +26,6 @@ class NotificationsList extends React.Component {
           {notifications}
         </div>
       );
-    } else {
-      return null;
     }
   }
 }

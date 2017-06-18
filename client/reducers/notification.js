@@ -3,7 +3,7 @@ import findIndex from 'lodash/findIndex';
 import shortid from 'shortid';
 
 // Reducer for notifications
-export default (state = [], action = {}) => {
+export default (state = { notifications: [] }, action = {}) => {
   switch (action.type) {
     case SET_NOTIFICATION_STATE:
       if (state.unreadNotifications === 0) {

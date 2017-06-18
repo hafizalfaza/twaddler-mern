@@ -14,6 +14,7 @@ class InitialPost extends React.Component {
     this.state = {
       isLiking: false,
       likedId: null,
+      liked: false,
       likedByUsers: null,
       commentActive: false,
       commentTextInput: '',
@@ -32,13 +33,15 @@ class InitialPost extends React.Component {
   }
 
   assignLikeStatus() {
-    if (this.props.user) {
+    if (this.props.user.user) {
       const isLikedByCurrentUser = $.inArray(this.props.user.user.username, this.props.initialPost.likedBy);
       if (isLikedByCurrentUser === -1) {
         this.setState({ liked: false, numberOfLikes: this.props.initialPost.likes });
       } else {
         this.setState({ liked: true, numberOfLikes: this.props.initialPost.likes });
       }
+    } else {
+      this.setState({ numberOfLikes: this.props.initialPost.likes });
     }
   }
 

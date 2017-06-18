@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import NavigationBar from '../NavigationBar';
 import { getProfileData, setProfileData, updateProfileData, storeNewProfileData } from '../../actions/profileActions';
 import NewsfeedTimeline from '../newsfeed/NewsfeedTimeline';
+import $ from 'jquery';
 
 class UserProfile extends React.Component {
   constructor(props) {
@@ -14,11 +15,18 @@ class UserProfile extends React.Component {
       username: '',
       bio: '',
       profilePic: '',
+      isFollowedByCurrentUser: false,
+      followButtonState: {
+        className: 'btn btn-success btn-sm center-block',
+        text: 'Following',
+      }
     };
     this.editProfile = this.editProfile.bind(this);
     this.onTyping = this.onTyping.bind(this);
     this.onSaveChange = this.onSaveChange.bind(this);
     this.onCancel = this.onCancel.bind(this);
+    this.onHoverFollowButton = this.onHoverFollowButton.bind(this);
+    this.onLeaveFollowButton = this.onLeaveFollowButton.bind(this);
   }
 
   componentDidMount() {
@@ -34,6 +42,14 @@ class UserProfile extends React.Component {
       this.props.getProfileData(username).then(
         res => this.props.setProfileData(res.data)
       );
+    }
+    if (nextProps.profileData.userInfo) {
+      const followingStatus = $.inArray(this.props.auth.user.id, nextProps.profileData.userInfo.following);
+      if (followingStatus === -1) {
+        this.setState({ isFollowedByCurrentUser: false });
+      } else {
+        this.setState({ isFollowedByCurrentUser: true });
+      }
     }
   }
 
@@ -54,6 +70,20 @@ class UserProfile extends React.Component {
         bio: '',
         profilePic,
       }, () => this.setState({ editProfileActive: true }));
+    }
+  }
+
+  onHoverFollowButton() {
+    const followingStatus = $.inArray(this.props.auth.user.id, this.props.profileData.userInfo.following);
+    if (followingStatus !== -1) {
+      this.setState({ followButtonState: { className: 'btn btn-danger btn-sm center-block', text: 'Unfollow' } });
+    }
+  }
+
+  onLeaveFollowButton() {
+    const followingStatus = $.inArray(this.props.auth.user.id, this.props.profileData.userInfo.following);
+    if (followingStatus !== -1) {
+      this.setState({ followButtonState: { className: 'btn btn-success btn-sm center-block', text: 'Following' } });
     }
   }
 
@@ -78,9 +108,10 @@ class UserProfile extends React.Component {
 
   render() {
     const { auth } = this.props;
-    const { editProfileActive } = this.state;
+    const { editProfileActive, isFollowedByCurrentUser, followButtonState } = this.state;
     const { profileData } = this.props;
     const { userInfo } = profileData;
+    const loading = require('./loading.gif');
     const profileSettings = (
       <a href='#' onClick={ this.editProfile }>
         <i className='glyphicon glyphicon-cog'></i>&nbsp;
@@ -88,6 +119,7 @@ class UserProfile extends React.Component {
       </a>);
 
     if (this.props.profileData.userInfo) {
+      const isCurrentUserProfile = this.props.auth.user.id === this.props.profileData.userInfo._id;
       const fullName = (<span style={ { fontSize: 20, fontWeight: 'bold' } }>{ userInfo.fullName }</span>);
       const username = (<span style={ { fontSize: 17 } }>@{ userInfo.username }</span>);
       const bio = (<span style={ { fontSize: 15 } }>{ userInfo.bio }</span>);
@@ -96,8 +128,7 @@ class UserProfile extends React.Component {
       const editProfilePic = (<input type='text' name='profilePic' value={ this.state.profilePic } onChange={ this.onTyping } placeholder='Paste picture url'/>);
       const followButton = (
         <div className='center-block' style={ { border: '1px solid black', width: 150 } }>
-          <button type='button' className='btn btn-success btn-sm' style={ { width: 70 } }>Follow</button>
-          <button type='button' className='btn btn-danger btn-sm pull-right' style={ { width: 70 } }>Message</button>
+          <button type='button' onMouseEnter={ this.onHoverFollowButton } onMouseLeave={ this.onLeaveFollowButton } className={ isFollowedByCurrentUser ? followButtonState.className : 'btn btn-primary btn-sm center-block' } style={ { width: 70 } }>{ isFollowedByCurrentUser ? followButtonState.text : '+ Follow' }</button>
         </div>
       );
       const saveChangeButton = (
@@ -127,7 +158,7 @@ class UserProfile extends React.Component {
                     </div>
                   </div>
                   <div className='profile-userbuttons center-block' style={ { border: '1px solid gray' } }>
-                    { editProfileActive ? saveChangeButton : followButton }
+                    { editProfileActive ? saveChangeButton : isCurrentUserProfile ? null : followButton }
                   </div>
                   <div className='profile-usermenu'>
                     <ul className='nav'>
@@ -163,7 +194,7 @@ class UserProfile extends React.Component {
         </div>
       );
     } else {
-      return null;
+      return <div><NavigationBar /><div className='container'><div className='col-md-4 col-md-offset-4'><img src={ loading }/></div></div></div>;
     }
   }
 }

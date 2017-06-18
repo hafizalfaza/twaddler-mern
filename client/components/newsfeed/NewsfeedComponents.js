@@ -21,6 +21,7 @@ class NewsfeedComponents extends React.Component {
       charCount: 0,
       alert: '',
       isLoading: false,
+      textInputEmpty: true,
       latestPost: 'false',
       errors: {},
       userPosting: false,
@@ -33,19 +34,18 @@ class NewsfeedComponents extends React.Component {
     this.textInputFocus = this.textInputFocus.bind(this);
     this.textInputBlur = this.textInputBlur.bind(this);
     this.revealCollectedPosts = this.revealCollectedPosts.bind(this);
+    this.sendNotification = this.sendNotification.bind(this);
   }
 
   componentDidMount() {
     // Initial posts request
     this.props.requestInitialPosts().then(
       (res) => {
-        if (res.data.initialPosts[0]) {
-          this.props.setInitialPosts(res.data.initialPosts);
-          this.setState({ latestPost: res.data.initialPosts[0].postDate });
-          // Set interval for perpetual recent posts request to 5 seconds
-          const intervalId = setInterval(this.requestRecentPosts, 5000);
-          this.setState({ intervalId });
-        }
+        this.props.setInitialPosts(res.data.initialPosts);
+        this.setState({ latestPost: res.data.initialPosts[0].postDate });
+        // Set interval for perpetual recent posts request to 5 seconds
+        const intervalId = setInterval(this.requestRecentPosts, 5000);
+        this.setState({ intervalId });
       },
       (err) => { this.setState({ errors: err.response.data }); },
     );
@@ -100,6 +100,12 @@ class NewsfeedComponents extends React.Component {
     } else {
       this.setState({ alert: 'Maximum character reached!' });
     }
+
+    if (charCount > 0) {
+      this.setState({ textInputEmpty: false });
+    } else {
+      this.setState({ textInputEmpty: true });
+    }
   }
 
   onPost(e) {
@@ -110,12 +116,18 @@ class NewsfeedComponents extends React.Component {
     } else {
       this.setState({ userPosting: true });
       this.props.userPostRequest(this.state)
-        .then(() => {
+        .then((res) => {
+          const text = res.data.post.text;
           this.requestRecentPosts({ isUser: true });
           clearInterval(this.state.intervalId);
+          this.sendNotification({ userMentioned: res.data.mention, triggeredBy: this.props.auth.user.id });
         })
         .catch((err) => { this.setState({ errors: err.response.data, inputText: '', charCount: 0, isLoading: false, userPosting: false }); });
     }
+  }
+
+  sendNotification(notificationData) {
+    socket.emit('send-notification', notificationData);
   }
 
   revealCollectedPosts() {
@@ -124,10 +136,12 @@ class NewsfeedComponents extends React.Component {
 
   // Conditional rendering
   render() {
+    const { isFetchingPosts } = this.props.initialPosts;
     if (this.props.initialPosts) {
       const { userPostRequest } = this.props;
-      const { numberOfCollectedPosts, recentPosts } = this.state;
       const { initialPosts } = this.props.initialPosts;
+      const { textInputEmpty } = this.state;
+      const loading = require('./loading.gif');
       return (
         <div className='container'>
           <div className='col-md-5 col-md-offset-3'>
@@ -135,6 +149,7 @@ class NewsfeedComponents extends React.Component {
               userPostRequest={ userPostRequest }
               onTyping={ this.onTyping }
               onPost={ this.onPost }
+              textInputEmpty = { textInputEmpty }
               inputText={ this.state.inputText }
               charCount={ this.state.charCount }
               alert={ this.state.alert }
@@ -144,7 +159,7 @@ class NewsfeedComponents extends React.Component {
               postActive={ this.state.postActive }
             />
             <CollectedPostsStatus revealCollectedPosts={ this.revealCollectedPosts }/>
-            <NewsfeedTimeline initialPosts={ initialPosts } recentPosts={ recentPosts } sendNotification={ this.props.sendNotification }/>
+            {isFetchingPosts ? <div className='center-block'><img src={ loading }/></div> : <NewsfeedTimeline initialPosts={ initialPosts } sendNotification={ this.props.sendNotification }/> }
           </div>
         </div>
       );

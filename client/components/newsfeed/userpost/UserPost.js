@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 class UserPost extends React.Component {
   render() {
-    const { inputText, charCount, alert, onTyping, onPost, isLoading, textInputFocus, textInputBlur, postActive } = this.props;
+    const { inputText, charCount, alert, onTyping, onPost, isLoading, textInputFocus, textInputBlur, postActive, textInputEmpty } = this.props;
     return (
       <div onBlur={ textInputBlur }>
         <form onSubmit={ onPost }>
@@ -25,7 +25,7 @@ class UserPost extends React.Component {
             { charCount }/140
           </div>
           <div className="form-group">
-            <button className="btn btn-primary btn-md" name="postButton" disabled={ isLoading }>
+            <button className="btn btn-primary btn-md" name="postButton" disabled={ isLoading || textInputEmpty }>
               Post
             </button>
           </div>

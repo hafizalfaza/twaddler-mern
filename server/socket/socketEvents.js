@@ -103,7 +103,28 @@ export default function socketEvents(io){
 				}
 			}
 			
+			
+			// Mention notification
+			if(notificationData.userMentioned) {
+				for(let i = 0; i < notificationData.userMentioned.length; i++){
+					for(let x=0; x<users.length; x++){
+						if(notificationData.userMentioned[i].toString()==users[x].username.toString()){
+							for(let y=0; y<users[x].socket.length; y++){
+								if(notificationData.triggeredBy.toString()!=users[x].username.toString()){
+									users[x].socket[y].emit('receive-notification', notificationData);
+								}else{
+									return null;
+								}						
+							}
+						}
+					}
+				}
+			}
+			
+			
 		});				
+		
+		
 		
 		
 		//Disconnect socket

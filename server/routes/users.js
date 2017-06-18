@@ -70,11 +70,9 @@ router.post('/post', authenticate, (req, res) => {
 							if(err){
 								res.status(500).json({msg: "Error"})
 							}else{
-								console.log(notification);
+								res.status(200).json({post: post, mention: mentionedUserArray});	
 							}
 						});
-						
-						res.status(200).json({post: post});	
 					}
 				});
 			}

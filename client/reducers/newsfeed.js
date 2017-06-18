@@ -3,13 +3,14 @@ import findIndex from 'lodash/findIndex';
 import shortid from 'shortid';
 
 // Reducer for redux posts store
-export default (state = {}, action = {}) => {
+export default (state = { initialPosts: [], isFetchingPosts: true }, action = {}) => {
   switch (action.type) {
     case SET_INITIAL_POSTS:
       return {
         collectedPosts: [],
         initialPosts: action.initialPosts,
         collectedPostsCount: 0,
+        isFetchingPosts: false,
       };
     case INJECT_POSTS_TO_NEWSFEED:
       if (state.collectedPosts) {
