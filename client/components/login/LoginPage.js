@@ -3,6 +3,13 @@ import LoginForm from './LoginForm';
 import { Link } from 'react-router-dom';
 
 class LoginPage extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      reloaded: false,
+    };
+  }
+
   render() {
     return (
       <div className='row' style={ { position: 'relative', top: 150 } }>

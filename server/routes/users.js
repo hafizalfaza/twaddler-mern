@@ -546,47 +546,52 @@ router.get('/profile/:username', (req, res) => {
 		if(err){
 			res.status(500).json({status: "failed"});
 		}else{
-			const userId = user._id
-			getPostsForProfile(userId, (err, posts) => {
-				if(err){
-					res.status(500).json({msg: "error"})
-				}else{
-					
-					const commentsUserIdArray = []
+			if(user) {
+				const userId = user._id
+				getPostsForProfile(userId, (err, posts) => {
+					if(err){
+						res.status(500).json({msg: "error"})
+					}else{
+						
+						const commentsUserIdArray = []
 
-					for(let i = 0; i < posts.length; i++){
-						for(let j = 0; j < posts[i].comments.length; j++){
-							commentsUserIdArray.push(posts[i].comments[j].user)
+						for(let i = 0; i < posts.length; i++){
+							for(let j = 0; j < posts[i].comments.length; j++){
+								commentsUserIdArray.push(posts[i].comments[j].user)
+							}
 						}
-					}
-					
-					getUsernameById(commentsUserIdArray, (err, username) => {
-						if(err){
-							res.status(500).json({msg: 'error'})
-						}else{
-							
-							for(let i = 0; i < posts.length; i++){
-								for(let j = 0; j < posts[i].comments.length; j++){
-									for(let k = 0; k < username.length; k++){
-										if(posts[i].comments[j].user.toString()==username[k]._id){
-											posts[i].comments[j].user=username[k].username;
+						
+						getUsernameById(commentsUserIdArray, (err, username) => {
+							if(err){
+								res.status(500).json({msg: 'error'})
+							}else{
+								
+								for(let i = 0; i < posts.length; i++){
+									for(let j = 0; j < posts[i].comments.length; j++){
+										for(let k = 0; k < username.length; k++){
+											if(posts[i].comments[j].user.toString()==username[k]._id){
+												posts[i].comments[j].user=username[k].username;
+											}
 										}
 									}
-								}
-							}						
-							
-							
-							for(let i = 0; i < posts.length; i++){
-								posts[i].postedBy = req.params.username;
-								posts[i].fullName = user.fullName;
-								posts[i].profilePic = user.profilePic;
-							}
-							res.status(200).json({userInfo: user, posts: posts})
+								}						
 								
-						}
-					});
-				}
-			});
+								
+								for(let i = 0; i < posts.length; i++){
+									posts[i].postedBy = req.params.username;
+									posts[i].fullName = user.fullName;
+									posts[i].profilePic = user.profilePic;
+								}
+								res.status(200).json({userInfo: user, posts: posts})
+									
+							}
+						});
+					}
+				});
+			}else{
+				res.status(200).json({userInfo: 'user not found'});
+			}
+			
 		}
 	});
 });	

@@ -27,7 +27,7 @@ class Comment extends React.Component {
     const recentStatement = 'a moment ago';
 
     return (
-      <div style={ { padding: 5, backgroundColor: '#E3ECF3', border: '1px solid #CAE9FF', fontSize: 12 } }>
+      <div style={ this.props.postHover ? { padding: 5, backgroundColor: '#F2F6F9', border: '1px solid #CAE9FF', fontSize: 12 } : { padding: 5, backgroundColor: '#E3ECF3', border: '1px solid #CAE9FF', fontSize: 12 } }>
         <span style={ { fontWeight: 'bold' } }><Link to={ profileLink }>{ user }</Link></span>&nbsp;&nbsp;{ comment }
         <span className='pull-right' style={ { fontSize: 12, color: 'gray' } }>{ second >= 1 && minute < 1 ? secondStatement : minute >= 1 && hour < 1 ? minuteStatement : hour >= 1 && day < 1 ? hourStatement : day >= 1 && week < 1 ? dayStatement : recentStatement }</span>
       </div>

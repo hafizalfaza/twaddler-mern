@@ -127,7 +127,7 @@ class Notification extends React.Component {
         <div><img src={ profilePic } className='media-object' style={ { width: 30, display: 'inline-block' } }/>&nbsp;&nbsp;&nbsp;<span><Link to={profileLink}>{ triggeredBy }</Link></span> commented on your post <img src={ commentIcon } style={ { width: 15 } } />&nbsp;&bull;&nbsp;
           <span style={ { color: 'gray', fontSize: 12 } }>{ this.convertDate(date) }</span>
         </div>
-        <div style={ { paddingTop: 20, paddingLeft: 20 } }><p>{ comment }</p></div>
+        <div style={ { paddingTop: 20, paddingLeft: 20 } }><p style={ { fontWeight: 'bold' } }>{ comment }</p></div>
         <div className='media well'>
           <div className='media-left'>
             <img src={ postData ? postData.profilePic : null } className='media-object img-rounded' style={ { width: 50 } }/>

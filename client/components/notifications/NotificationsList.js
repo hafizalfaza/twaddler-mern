@@ -15,9 +15,11 @@ class NotificationsList extends React.Component {
   }
 
   render() {
-    if (this.props.notifications.notifications.length === 0) {
+    const loading = require('./loading.gif');
+    const { isFetchingNotifications } = this.props.notifications;
+    if (this.props.notifications.notifications.length === 0 && isFetchingNotifications === false) {
       return (<div className='text-center' ><h1 style={ { color: 'gray' } }>No Notification</h1></div>);
-    } else {
+    } else if (this.props.notifications.notifications.length > 0 && isFetchingNotifications === false) {
       const notifications = this.props.notifications.notifications.map(notification =>
         <Notification key={ notification.notificationId } notification={ notification } />
       );
@@ -26,6 +28,10 @@ class NotificationsList extends React.Component {
           {notifications}
         </div>
       );
+    } else if (isFetchingNotifications || typeof (isFetchingNotifications) === 'undefined') {
+      return <div><img src={ loading }/></div>;
+    } else {
+      return null;
     }
   }
 }

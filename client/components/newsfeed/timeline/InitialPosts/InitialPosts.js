@@ -6,7 +6,7 @@ class InitialPosts extends React.Component {
   render() {
     if (this.props.initialPosts) {
       const initialPosts = this.props.initialPosts.map(initialPost =>
-        <InitialPost key={ initialPost._id } initialPost={ initialPost } comments={ initialPost.comments } sendNotification={ this.props.sendNotification }/>
+        <InitialPost key={ initialPost._id } initialPost={ initialPost } comments={ initialPost.comments } sendNotification={ this.props.sendNotification } profileRoute={ this.props.profileRoute }/>
       );
       return (
         <div>

@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { likeThis, dislikeThis, addCommentToInitialPosts } from '../../../../actions/timelineActions';
 import { postComment } from '../../../../actions/commentActions';
+import { addCommentToProfilePosts } from '../../../../actions/profileActions';
 import $ from 'jquery';
 import CommentSection from '../CommentSection/CommentSection';
 
@@ -18,6 +19,9 @@ class InitialPost extends React.Component {
       likedByUsers: null,
       commentActive: false,
       commentTextInput: '',
+      postHover: false,
+      commentHover: false,
+      likeHover: false,
     };
     this.like = this.like.bind(this);
     this.assignLikeStatus = this.assignLikeStatus.bind(this);
@@ -25,23 +29,36 @@ class InitialPost extends React.Component {
     this.onTypingComment = this.onTypingComment.bind(this);
     this.onPostComment = this.onPostComment.bind(this);
     this.transpileText = this.transpileText.bind(this);
+    this.onPostLeave = this.onPostLeave.bind(this);
+    this.onPostHover = this.onPostHover.bind(this);
+    this.onCommentHover = this.onCommentHover.bind(this);
+    this.onCommentLeave = this.onCommentLeave.bind(this);
+    this.onLikeHover = this.onLikeHover.bind(this);
+    this.onLikeLeave = this.onLikeLeave.bind(this);
   }
 
   componentWillMount() {
-    this.assignLikeStatus();
+    if (this.props.user.user) {
+      this.assignLikeStatus();
+    }
     this.setState({ likedByUsers: this.props.initialPost.likedBy });
   }
 
   assignLikeStatus() {
-    if (this.props.user.user) {
-      const isLikedByCurrentUser = $.inArray(this.props.user.user.username, this.props.initialPost.likedBy);
+    if (this.props.profileRoute) {
+      const isLikedByCurrentUser = $.inArray(this.props.user.id, this.props.initialPost.likedBy);
       if (isLikedByCurrentUser === -1) {
         this.setState({ liked: false, numberOfLikes: this.props.initialPost.likes });
       } else {
         this.setState({ liked: true, numberOfLikes: this.props.initialPost.likes });
       }
     } else {
-      this.setState({ numberOfLikes: this.props.initialPost.likes });
+      const isLikedByCurrentUser = $.inArray(this.props.user.user.username, this.props.initialPost.likedBy);
+      if (isLikedByCurrentUser === -1) {
+        this.setState({ liked: false, numberOfLikes: this.props.initialPost.likes });
+      } else {
+        this.setState({ liked: true, numberOfLikes: this.props.initialPost.likes });
+      }
     }
   }
 
@@ -98,10 +115,37 @@ class InitialPost extends React.Component {
           this.setState({ commentTextInput: '' });
           this.props.sendNotification(res.data);
           this.props.addCommentToInitialPosts(res.data);
+          if (this.props.profileRoute) {
+            this.props.addCommentToProfilePosts(res.data);
+          }
         },
         (err) => { this.setState({ commentTextInput: '' }); },
       );
     }
+  }
+
+  onPostHover() {
+    this.setState({ postHover: true });
+  }
+
+  onPostLeave() {
+    this.setState({ postHover: false });
+  }
+
+  onCommentHover() {
+    this.setState({ commentHover: true });
+  }
+
+  onCommentLeave() {
+    this.setState({ commentHover: false });
+  }
+
+  onLikeHover() {
+    this.setState({ likeHover: true });
+  }
+
+  onLikeLeave() {
+    this.setState({ likeHover: false });
   }
 
   transpileText(text) {
@@ -123,7 +167,7 @@ class InitialPost extends React.Component {
   render() {
     const { _id, postedBy, fullName, text, postDate, likes, likedBy, commentsCount, profilePic } = this.props.initialPost;
     const { comments } = this.props;
-    const { liked, numberOfLikes, likedByUsers, commentActive } = this.state;
+    const { liked, numberOfLikes, likedByUsers, commentActive, postHover, commentHover, likeHover } = this.state;
     const loveOn = require('./love_on.png');
     const loveOff = require('./love_off.png');
     const comment = require('./comment.png');
@@ -156,7 +200,7 @@ class InitialPost extends React.Component {
     const commentInput = (
       <div>
         <div style={ { paddingTop: 10 } }>
-          <CommentSection comments={ this.props.comments }/>
+          <CommentSection comments={ this.props.comments } postHover={ postHover }/>
         </div>
         <div className="input-group" style={ { paddingTop: 15 } }>
           <input type="text" className="form-control" value={ this.state.commentTextInput }onChange={ this.onTypingComment } autoFocus/>
@@ -168,7 +212,7 @@ class InitialPost extends React.Component {
 
     return (
       <div>
-        <div className="media well" style={ { marginBottom: 0 } }>
+        <div className="media well" onMouseEnter={ this.onPostHover } onMouseLeave={ this.onPostLeave } style={ postHover ? { marginBottom: 0, backgroundColor: '#EDF2F5', cursor: 'pointer' } : { marginBottom: 0 } }>
           <div className="media-left">
             <img src={ profilePic } className="media-object img-rounded" style={ { width: 50 } }/>
           </div>
@@ -178,9 +222,9 @@ class InitialPost extends React.Component {
             </h4>
             <p>{ this.transpileText(text) ? this.transpileText(text) : text }</p>
             <div className="pull-left">
-              <a href="#" onClick={ this.onClickComment } style={ { textDecoration: 'none' } }><span ><img src={ comment } style={ { width: 14 } }/></span></a>&nbsp;<span>{ commentsCount }</span>
+              <span ><img onClick={ this.onClickComment } onMouseEnter={ this.onCommentHover } onMouseLeave={ this.onCommentLeave }src={ comment } style={ commentHover ? { width: 16 } : { width: 14 } }/></span>&nbsp;<span>{ commentsCount }</span>
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-              <a href="#" id={ _id } onClick={ this.like } style={ { textDecoration: 'none' } }><img id={ _id } src={ liked ? loveOn : loveOff } style={ { width: 11 } } /> </a><span style={ { fontSize: 12 } }>{ numberOfLikes }</span>
+              <img id={ _id } onClick={ this.like } onMouseEnter={ this.onLikeHover } onMouseLeave={ this.onLikeLeave } src={ liked ? loveOn : loveOff } style={ likeHover ? { width: 13 } : { width: 11 }} /><span style={ { fontSize: 12 } }>&nbsp;{ numberOfLikes }</span>
             </div>
           </div>
           { commentActive ? commentInput : null }
@@ -203,4 +247,4 @@ function mapStateToProps(state) {
   return state.auth;
 }
 
-export default connect(mapStateToProps, { likeThis, dislikeThis, postComment, addCommentToInitialPosts })(InitialPost);
+export default connect(mapStateToProps, { likeThis, dislikeThis, postComment, addCommentToInitialPosts, addCommentToProfilePosts })(InitialPost);

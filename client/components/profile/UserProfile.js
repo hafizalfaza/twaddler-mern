@@ -5,6 +5,9 @@ import NavigationBar from '../NavigationBar';
 import { getProfileData, setProfileData, updateProfileData, storeNewProfileData } from '../../actions/profileActions';
 import NewsfeedTimeline from '../newsfeed/NewsfeedTimeline';
 import $ from 'jquery';
+import io from 'socket.io-client';
+
+const socket = io('http://localhost:3000');
 
 class UserProfile extends React.Component {
   constructor(props) {
@@ -27,6 +30,7 @@ class UserProfile extends React.Component {
     this.onCancel = this.onCancel.bind(this);
     this.onHoverFollowButton = this.onHoverFollowButton.bind(this);
     this.onLeaveFollowButton = this.onLeaveFollowButton.bind(this);
+    this.sendNotification = this.sendNotification.bind(this);
   }
 
   componentDidMount() {
@@ -102,6 +106,10 @@ class UserProfile extends React.Component {
       );
   }
 
+  sendNotification(notificationData) {
+    socket.emit('send-notification', notificationData);
+  }
+
   onCancel() {
     this.setState({ editProfileActive: false, username: '', fullName: '', bio: '', profilePic: '' });
   }
@@ -127,57 +135,62 @@ class UserProfile extends React.Component {
       const editBio = (<input type='text' name='bio' value={ this.state.bio } onChange={ this.onTyping } placeholder='Type your bio'/>);
       const editProfilePic = (<input type='text' name='profilePic' value={ this.state.profilePic } onChange={ this.onTyping } placeholder='Paste picture url'/>);
       const followButton = (
-        <div className='center-block' style={ { border: '1px solid black', width: 150 } }>
+        <div className='center-block' style={ { width: 150 } }>
           <button type='button' onMouseEnter={ this.onHoverFollowButton } onMouseLeave={ this.onLeaveFollowButton } className={ isFollowedByCurrentUser ? followButtonState.className : 'btn btn-primary btn-sm center-block' } style={ { width: 70 } }>{ isFollowedByCurrentUser ? followButtonState.text : '+ Follow' }</button>
         </div>
       );
       const saveChangeButton = (
-        <div className='center-block' style={ { border: '1px solid black', width: 170 } }>
+        <div className='center-block' style={ { width: 170 } }>
           <button type='button' className='btn btn-danger btn-sm' style={ { width: 60 } } onClick={ this.onCancel }>Cancel</button>
           <button type='button' className='btn btn-primary btn-sm pull-right' style={ { width: 100 } } onClick={ this.onSaveChange }>Save Change</button>
         </div>);
 
       return (
         <div>
+          { editProfileActive ? <div style={ { position: 'absolute', width: '100%', height: '100%', border: '3px solid black', backgroundColor: 'black', zIndex: 0, opacity: 0.4 } }></div> : null }
           <NavigationBar />
-          <div className='container' style={ { border: '1px solid black' } }>
-            <div className='row profile' style={ { border: '1px solid blue' } }>
-              <div className='col-md-3' style={ { border: '1px solid purple' } }>
-                <div className='profile-sidebar' style={ { border: '1px solid red' } }>
+          <div className='container'>
+            <div className='row profile'>
+              <div className='col-md-3'>
+                <div className='profile-sidebar' style={ { border: '2px solid gray' } }>
                   <div className='profile-userpic'>
                     <img src={ userInfo.profilePic } className='img-responsive center-block' style={ { width: 150 } }alt=''/>
                   </div>
                   <div className='profile-usertitle'>
-                    <div className='profile-usertitle-name text-center'>
-                      <div style={ { padding: 8 } }>
-                        <div>{ editProfileActive ? editFullName : fullName }</div>
-                        <div>{ username }</div>
-                        <div>{ editProfileActive ? editBio : bio }</div>
-                        <div>{ editProfileActive ? editProfilePic : null }</div>
+                    <div className='profile-usertitle-name text-center' style={ { padding: 8, zIndex: 1 } }>
+                      <div>
+                        { editProfileActive ? <span style={ { fontWeight: 'bold' } }>Full Name</span> : null }
+                        <div style={ editProfileActive ? { marginBottom: 15 } : null }>{ editProfileActive ? editFullName : fullName }</div>
+                        { editProfileActive ? <span style={ { fontWeight: 'bold' } }>Username</span> : null }
+                        <div style={ editProfileActive ? { marginBottom: 15 } : null }>{ username }</div>
+                        { editProfileActive ? <span style={ { fontWeight: 'bold' } }>Bio</span> : null }
+                        <div style={ editProfileActive ? { marginBottom: 15 } : null }>{ editProfileActive ? editBio : bio }</div>
+                        { editProfileActive ? <span style={ { fontWeight: 'bold' } }>Profile Picture Url</span> : null }
+                        <div style={ editProfileActive ? { marginBottom: 15 } : null }>{ editProfileActive ? editProfilePic : null }</div>
                       </div>
                     </div>
                   </div>
-                  <div className='profile-userbuttons center-block' style={ { border: '1px solid gray' } }>
+                  <div className='profile-userbuttons center-block' >
                     { editProfileActive ? saveChangeButton : isCurrentUserProfile ? null : followButton }
                   </div>
-                  <div className='profile-usermenu'>
+                  <div className='profile-usermenu' style={ editProfileActive ? { display: 'none' } : { border: '1px solid gray' } }>
                     <ul className='nav'>
-                      <li className='active'>
+                      <li className='active' style={ { border: '1px solid gray' } }>
                         <a href='#'>
                           Posts: { userInfo.posts }
                         </a>
                       </li>
-                      <li>
+                      <li style={ { border: '1px solid gray' } }>
                         <a href='#'>
                           Following: { userInfo.followingNum }
                         </a>
                       </li>
-                      <li>
+                      <li style={ { border: '1px solid gray' } }>
                         <a href='#' target='_blank'>
                           Followers: { userInfo.followersNum }
                         </a>
                       </li>
-                      <li>
+                      <li style={ { border: '1px solid gray' } }>
                         {auth.isAuthenticated && profileData.userInfo.username === auth.user.user.username ? profileSettings : null}
                       </li>
                     </ul>
@@ -185,14 +198,16 @@ class UserProfile extends React.Component {
                 </div>
               </div>
               <div className='col-md-8'>
-                <div className='profile-content col-md-8' style={ { marginLeft: 100 } }>
-                  <NewsfeedTimeline initialPosts={ profileData.posts }/>
+                <div className='profile-content col-md-8' style={ editProfileActive ? { marginLeft: 100, zIndex: -1 } : { marginLeft: 100, zIndex: 0 } }>
+                  <NewsfeedTimeline initialPosts={ profileData.posts } profileRoute={ this.props.match.params.username } sendNotification={this.sendNotification}/>
                 </div>
               </div>
             </div>
           </div>
         </div>
       );
+    } else if (this.props.profileData.userInfo === 'user not found') {
+      return <div><NavigationBar /><div className='container'><div className='col-md-4 col-md-offset-4'>User not found</div></div></div>;
     } else {
       return <div><NavigationBar /><div className='container'><div className='col-md-4 col-md-offset-4'><img src={ loading }/></div></div></div>;
     }

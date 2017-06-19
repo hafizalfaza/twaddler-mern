@@ -2,7 +2,7 @@ import React from 'react';
 import TextFieldGroup from '../common/TextFieldGroup';
 import validateInput from '../../../server/shared/validations/loginValidation';
 import { connect } from 'react-redux';
-import { userLoginRequest } from '../../actions/loginActions';
+import { userLoginRequest, setReloaded } from '../../actions/loginActions';
 import PropTypes from 'prop-types';
 
 class LoginForm extends React.Component {
@@ -33,6 +33,7 @@ class LoginForm extends React.Component {
       this.props.userLoginRequest(this.state).then(
         (res) => {
           this.context.router.history.push('/');
+          window.location.reload();
         }
       ).then(() => this.props.receiveNotifications())
         .catch((err) => { this.setState({ errors: err.response.data.errors, isLoading: false }); });
@@ -83,5 +84,5 @@ LoginForm.contextTypes = {
   router: PropTypes.object.isRequired,
 };
 
-export default connect(null, { userLoginRequest })(LoginForm);
+export default connect(null, { userLoginRequest, setReloaded })(LoginForm);
 

@@ -1,4 +1,4 @@
-import { GET_USER_INFORMATION, SET_PROFILE_DATA, UPDATE_PROFILE_DATA } from '../actions/types';
+import { GET_USER_INFORMATION, SET_PROFILE_DATA, UPDATE_PROFILE_DATA, ADD_COMMENT_TO_PROFILE_POSTS } from '../actions/types';
 
 export default(state = [], action = {}) => {
   switch (action.type) {
@@ -22,6 +22,20 @@ export default(state = [], action = {}) => {
           profilePic: action.newProfileData.profilePic,
         },
         posts: postsArray,
+      };
+    case ADD_COMMENT_TO_PROFILE_POSTS:
+      const newArray = [];
+      for (let i = 0; i < state.posts.length; i++) {
+        if (state.posts[i]._id.toString() === action.data.postCommented[0]._id.toString()) {
+          newArray.push(action.data.postCommented[0]);
+        } else {
+          newArray.push(state.posts[i]);
+        }
+      }
+
+      return {
+        ...state,
+        posts: newArray,
       };
     default: return state;
   }

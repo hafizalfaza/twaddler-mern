@@ -6,7 +6,7 @@ class CommentSection extends React.Component {
     if (this.props.comments) {
       return (
         <div style={ this.props.comments.length > 5 ? { height: 145, overflowY: 'auto' } : null }>
-          <CommentsList comments={ this.props.comments }/>
+          <CommentsList comments={ this.props.comments } postHover={ this.props.postHover }/>
         </div>
       );
     } else {

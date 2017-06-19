@@ -5,7 +5,7 @@ class CommentsList extends React.Component {
   render() {
     if (this.props.comments) {
       const comments = this.props.comments.map(comment =>
-        <Comment key={ comment.commentId } comment={ comment } />
+        <Comment key={ comment.commentId } comment={ comment } postHover={ this.props.postHover }/>
       );
       return (
         <div >

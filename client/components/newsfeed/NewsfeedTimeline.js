@@ -9,7 +9,7 @@ class Dashboard extends React.Component {
     } else {
       return (
         <div>
-          <InitialPosts initialPosts={ initialPosts } currentUser={ currentUser } sendNotification={ this.props.sendNotification }/>
+          <InitialPosts initialPosts={ initialPosts } currentUser={ currentUser } sendNotification={ this.props.sendNotification } profileRoute={ this.props.profileRoute }/>
         </div>
       );
     }

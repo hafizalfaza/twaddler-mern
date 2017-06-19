@@ -3,16 +3,20 @@ import findIndex from 'lodash/findIndex';
 import shortid from 'shortid';
 
 // Reducer for notifications
-export default (state = { notifications: [] }, action = {}) => {
+export default (state = { notifications: [], isFetchingNotifications: true }, action = {}) => {
   switch (action.type) {
     case SET_NOTIFICATION_STATE:
       if (state.unreadNotifications === 0) {
         return {
           notifications: action.notifications.notifications.notifications,
           unreadNotifications: 0,
+          isFetchingNotifications: false,
         };
       } else {
-        return action.notifications.notifications;
+        return {
+          notifications: action.notifications.notifications.notifications,
+          isFetchingNotifications: false,
+        };
       }
     case UPDATE_UNREAD_NOTIFICATIONS:
       return {
