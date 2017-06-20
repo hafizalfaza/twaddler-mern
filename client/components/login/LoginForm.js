@@ -30,12 +30,9 @@ class LoginForm extends React.Component {
     e.preventDefault();
     if (this.isValid()) {
       this.setState({ errors: {}, isLoading: true });
-      this.props.userLoginRequest(this.state).then(
-        (res) => {
-          this.context.router.history.push('/');
-          window.location.reload();
-        }
-      ).then(() => this.props.receiveNotifications())
+      this.props.userLoginRequest(this.state)
+        .then(res => this.context.router.history.push('/'))
+        .then(() => this.props.receiveNotifications())
         .catch((err) => { this.setState({ errors: err.response.data.errors, isLoading: false }); });
     }
   }

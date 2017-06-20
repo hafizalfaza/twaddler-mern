@@ -8,7 +8,6 @@ const router = express.Router();
 //Get search result
 router.get('/str/:searchQuery', authenticate, (req, res) => {
 	const searchQuery = req.params.searchQuery;
-	
 	getUserBySearchQuery(searchQuery, (err, user) => {
 		if(err){
 			res.status(500).json({msg: "Internal server error"});

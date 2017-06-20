@@ -10,6 +10,7 @@ export default (req, res, next) => {
 		token = authorizationHeader.split(' ')[1];
 	}
 	
+	
 	if(token){
 		jwt.verify(token, config.jwtSecret, (err, decoded) => {
 			if(err){
@@ -27,6 +28,7 @@ export default (req, res, next) => {
 			}
 		});
 	}else{
+		console.log('token: ' + token);
 		res.status(403).json({
 			error: 'No token provided'
 		});

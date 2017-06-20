@@ -4,7 +4,6 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { logout } from '../actions/loginActions';
 import { resetReduxState } from '../actions/logoutActions';
-import { search, fetchSearchResult, resetSearchState } from '../actions/searchActions';
 
 // NavBar component
 class NavigationBar extends React.Component {
@@ -16,7 +15,6 @@ class NavigationBar extends React.Component {
       searchBarBlank: true,
       username: '',
     };
-    this.submitSearch = this.submitSearch.bind(this);
     this.onChange = this.onChange.bind(this);
     this.updateUsername = this.updateUsername.bind(this);
   }
@@ -37,30 +35,6 @@ class NavigationBar extends React.Component {
     }
   }
 
-  submitSearch(e) {
-    e.preventDefault();
-    this.setState({ searchInput: '' });
-    this.props.resetSearchState();
-    this.props.search(this.state.searchInput).then(
-      (res) => {
-        if (res.data.user) {
-          const { _id, fullName, username, bio, following, followers, profilePic } = res.data.user;
-          this.props.fetchSearchResult({
-            id: _id,
-            fullName,
-            username,
-            bio,
-            profilePic,
-            following,
-            followers,
-          });
-        }
-      },
-      (err) => { this.setState({ errors: err.response.data }); },
-    );
-    this.context.router.history.push('/search/str/' + this.state.searchInput);
-  }
-
   onChange(e) {
     this.setState({ [e.target.name]: e.target.value });
     if (e.target.value === '') {
@@ -71,6 +45,7 @@ class NavigationBar extends React.Component {
   }
 
   logout(e) {
+    window.location.reload();
     this.props.logout();
     this.setState({ username: '' });
     this.props.resetReduxState();
@@ -99,7 +74,7 @@ class NavigationBar extends React.Component {
     );
 
     const searchBar = (
-      <form className='navbar-form navbar-left' onSubmit={ this.submitSearch }>
+      <form className='navbar-form navbar-left'>
         <div className='input-group'>
           <input
             type='text'
@@ -110,9 +85,10 @@ class NavigationBar extends React.Component {
             onChange={ this.onChange }
           />
           <div className='input-group-btn'>
-            <button className='btn btn-default' type='submit' disabled={ this.state.searchBarBlank }>
+            <Link to={ `/search/str/${this.state.searchInput}` }><button className='btn btn-default' disabled={ this.state.searchBarBlank }>
               <i className='glyphicon glyphicon-search'></i>
             </button>
+            </Link>
           </div>
         </div>
       </form>
@@ -137,9 +113,6 @@ class NavigationBar extends React.Component {
 NavigationBar.propTypes = {
   auth: PropTypes.object.isRequired,
   logout: PropTypes.func.isRequired,
-  search: PropTypes.func.isRequired,
-  fetchSearchResult: PropTypes.func.isRequired,
-  resetSearchState: PropTypes.func.isRequired,
 };
 
 NavigationBar.contextTypes = {
@@ -153,4 +126,4 @@ function mapStateToProps(state) {
   };
 }
 
-export default connect(mapStateToProps, { logout, search, fetchSearchResult, resetSearchState, resetReduxState })(NavigationBar);
+export default connect(mapStateToProps, { logout, resetReduxState })(NavigationBar);

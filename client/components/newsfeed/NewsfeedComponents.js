@@ -58,6 +58,12 @@ class NewsfeedComponents extends React.Component {
     );
   }
 
+  componentWillMount() {
+    socket.on('receive-notification', () => {
+      this.props.updateUnreadNotificationsState();
+    });
+  }
+
   componentWillUnmount() {
     clearInterval(this.state.intervalId);
   }

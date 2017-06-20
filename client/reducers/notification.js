@@ -15,12 +15,13 @@ export default (state = { notifications: [], isFetchingNotifications: true }, ac
       } else {
         return {
           notifications: action.notifications.notifications.notifications,
+          unreadNotifications: action.notifications.notifications.unreadNotifications,
           isFetchingNotifications: false,
         };
       }
     case UPDATE_UNREAD_NOTIFICATIONS:
       return {
-        notifications: state.notifications,
+        ...state,
         unreadNotifications: state.unreadNotifications + 1,
       };
     case RESET_UNREAD_NOTIFICATION:
